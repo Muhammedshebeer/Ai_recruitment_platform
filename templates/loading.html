@@ -1,0 +1,473 @@
+{% extends "base.html" %}
+
+{% block title %}
+Analyzing Resume...
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .loading-shell {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .loading-shell::before {
+        content: "";
+        position: absolute;
+        width: 420px;
+        height: 420px;
+        border-radius: 999px;
+        background: rgba(59, 130, 246, 0.18);
+        filter: blur(110px);
+        top: -120px;
+        left: -120px;
+        z-index: 0;
+    }
+
+    .loading-shell::after {
+        content: "";
+        position: absolute;
+        width: 420px;
+        height: 420px;
+        border-radius: 999px;
+        background: rgba(6, 182, 212, 0.18);
+        filter: blur(110px);
+        bottom: -120px;
+        right: -120px;
+        z-index: 0;
+    }
+
+    .loading-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .ai-card {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .ai-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -120%;
+        width: 80%;
+        height: 100%;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(34, 211, 238, 0.16),
+            transparent
+        );
+        animation: scanMove 2.4s infinite;
+    }
+
+    @keyframes scanMove {
+        0% {
+            left: -120%;
+        }
+        100% {
+            left: 140%;
+        }
+    }
+
+    .robot-pulse {
+        animation: robotPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes robotPulse {
+        0%, 100% {
+            transform: translateY(0) scale(1);
+            box-shadow: 0 0 0 rgba(6, 182, 212, 0.0);
+        }
+        50% {
+            transform: translateY(-6px) scale(1.04);
+            box-shadow: 0 0 45px rgba(6, 182, 212, 0.35);
+        }
+    }
+
+    .step-item {
+        transition: all .35s ease;
+        opacity: .45;
+    }
+
+    .step-item.active {
+        opacity: 1;
+        border-color: rgba(34, 211, 238, .75);
+        background: rgba(6, 182, 212, .08);
+        transform: translateY(-3px);
+    }
+
+    .step-item.done {
+        opacity: 1;
+        border-color: rgba(34, 197, 94, .55);
+        background: rgba(34, 197, 94, .08);
+    }
+
+    .progress-ring-circle {
+        transition: stroke-dashoffset .7s ease;
+        transform: rotate(-90deg);
+        transform-origin: 50% 50%;
+    }
+
+    .dot {
+        animation: dotBlink 1.4s infinite both;
+    }
+
+    .dot:nth-child(2) {
+        animation-delay: .2s;
+    }
+
+    .dot:nth-child(3) {
+        animation-delay: .4s;
+    }
+
+    @keyframes dotBlink {
+        0%, 80%, 100% {
+            opacity: .25;
+            transform: translateY(0);
+        }
+        40% {
+            opacity: 1;
+            transform: translateY(-4px);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<section class="min-h-screen flex items-center justify-center px-6 py-16 loading-shell">
+
+    <div class="loading-content max-w-5xl w-full">
+
+        <div class="glass ai-card rounded-[2rem] p-8 lg:p-12 shadow-2xl">
+
+            <div class="grid lg:grid-cols-[360px_1fr] gap-12 items-center">
+
+                <!-- Left Counter Area -->
+                <div class="text-center">
+
+                    <div class="relative mx-auto w-64 h-64 flex items-center justify-center">
+
+                        <svg class="absolute inset-0 w-full h-full" viewBox="0 0 220 220">
+
+                            <circle
+                                cx="110"
+                                cy="110"
+                                r="92"
+                                stroke="rgba(148, 163, 184, 0.18)"
+                                stroke-width="14"
+                                fill="none">
+                            </circle>
+
+                            <circle
+                                id="progressRing"
+                                class="progress-ring-circle"
+                                cx="110"
+                                cy="110"
+                                r="92"
+                                stroke="url(#progressGradient)"
+                                stroke-width="14"
+                                stroke-linecap="round"
+                                fill="none"
+                                stroke-dasharray="578"
+                                stroke-dashoffset="578">
+                            </circle>
+
+                            <defs>
+                                <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#3B82F6"></stop>
+                                    <stop offset="100%" stop-color="#06B6D4"></stop>
+                                </linearGradient>
+                            </defs>
+
+                        </svg>
+
+                        <div class="w-36 h-36 rounded-[2rem] bg-gradient-to-r from-blue-500 to-cyan-500 flex flex-col items-center justify-center robot-pulse">
+
+                            <i class="fa-solid fa-robot text-5xl text-white"></i>
+
+                            <div class="flex gap-1 mt-3">
+                                <span class="dot w-2 h-2 rounded-full bg-white"></span>
+                                <span class="dot w-2 h-2 rounded-full bg-white"></span>
+                                <span class="dot w-2 h-2 rounded-full bg-white"></span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <h2 id="counterText" class="text-6xl font-black mt-8 text-cyan-400">
+                        0%
+                    </h2>
+
+                    <p class="text-gray-400 mt-2">
+                        Resume analysis progress
+                    </p>
+
+                    <div class="mt-6 rounded-2xl bg-white/5 border border-white/10 p-4">
+
+                        <p class="text-gray-400 text-sm">
+                            Time elapsed
+                        </p>
+
+                        <p id="timerText" class="text-2xl font-black mt-1">
+                            00:00
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <!-- Right Content Area -->
+                <div>
+
+                    <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-300 text-sm font-semibold">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        AI Resume Checker
+                    </span>
+
+                    <h1 class="text-4xl lg:text-5xl font-black mt-6 leading-tight">
+                        Analyzing your resume
+                    </h1>
+
+                    <p class="text-gray-400 mt-5 text-lg leading-8">
+                        Our AI is reading your resume, extracting key information,
+                        checking skills, calculating ATS score, and preparing your report.
+                    </p>
+
+                    <div class="mt-8">
+
+                        <div class="w-full h-3 rounded-full bg-slate-800 overflow-hidden">
+
+                            <div
+                                id="progressBar"
+                                class="h-3 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 transition-all duration-700"
+                                style="width:0%">
+                            </div>
+
+                        </div>
+
+                        <div class="flex justify-between items-center mt-4">
+
+                            <p id="progressText" class="text-cyan-400 font-semibold">
+                                Initializing AI engine...
+                            </p>
+
+                            <p id="smallCounterText" class="text-gray-400 font-semibold">
+                                0%
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-4 mt-10">
+
+                        <div id="step1" class="step-item glass rounded-2xl p-5 flex items-center gap-4 border border-transparent">
+                            <i class="fa-solid fa-file-pdf text-red-400 text-2xl"></i>
+                            <div>
+                                <h3 class="font-bold">Reading PDF</h3>
+                                <p class="text-gray-500 text-sm">Checking uploaded file</p>
+                            </div>
+                        </div>
+
+                        <div id="step2" class="step-item glass rounded-2xl p-5 flex items-center gap-4 border border-transparent">
+                            <i class="fa-solid fa-font text-blue-400 text-2xl"></i>
+                            <div>
+                                <h3 class="font-bold">Extracting Text</h3>
+                                <p class="text-gray-500 text-sm">Reading resume content</p>
+                            </div>
+                        </div>
+
+                        <div id="step3" class="step-item glass rounded-2xl p-5 flex items-center gap-4 border border-transparent">
+                            <i class="fa-solid fa-code text-cyan-400 text-2xl"></i>
+                            <div>
+                                <h3 class="font-bold">Finding Skills</h3>
+                                <p class="text-gray-500 text-sm">Detecting key abilities</p>
+                            </div>
+                        </div>
+
+                        <div id="step4" class="step-item glass rounded-2xl p-5 flex items-center gap-4 border border-transparent">
+                            <i class="fa-solid fa-chart-line text-green-400 text-2xl"></i>
+                            <div>
+                                <h3 class="font-bold">ATS Score</h3>
+                                <p class="text-gray-500 text-sm">Calculating score</p>
+                            </div>
+                        </div>
+
+                        <div id="step5" class="step-item glass rounded-2xl p-5 flex items-center gap-4 border border-transparent">
+                            <i class="fa-solid fa-lightbulb text-yellow-400 text-2xl"></i>
+                            <div>
+                                <h3 class="font-bold">Suggestions</h3>
+                                <p class="text-gray-500 text-sm">Preparing improvements</p>
+                            </div>
+                        </div>
+
+                        <div id="step6" class="step-item glass rounded-2xl p-5 flex items-center gap-4 border border-transparent">
+                            <i class="fa-solid fa-circle-check text-purple-400 text-2xl"></i>
+                            <div>
+                                <h3 class="font-bold">Final Report</h3>
+                                <p class="text-gray-500 text-sm">Building dashboard</p>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="mt-8 rounded-2xl bg-yellow-500/10 border border-yellow-500/20 p-5">
+
+                        <div class="flex gap-3">
+
+                            <i class="fa-solid fa-circle-info text-yellow-400 mt-1"></i>
+
+                            <p class="text-gray-300 leading-7">
+                                Large resumes may take longer depending on Ollama model speed.
+                                Please keep this page open.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<script>
+    const progressBar = document.getElementById("progressBar");
+    const progressRing = document.getElementById("progressRing");
+    const progressText = document.getElementById("progressText");
+    const counterText = document.getElementById("counterText");
+    const smallCounterText = document.getElementById("smallCounterText");
+    const timerText = document.getElementById("timerText");
+
+    const ringLength = 578;
+
+    const steps = [
+        {
+            text: "Reading uploaded PDF...",
+            percent: 12,
+            id: "step1"
+        },
+        {
+            text: "Extracting resume text...",
+            percent: 28,
+            id: "step2"
+        },
+        {
+            text: "Detecting skills and experience...",
+            percent: 48,
+            id: "step3"
+        },
+        {
+            text: "Calculating ATS score...",
+            percent: 68,
+            id: "step4"
+        },
+        {
+            text: "Generating improvement suggestions...",
+            percent: 86,
+            id: "step5"
+        },
+        {
+            text: "Preparing final report...",
+            percent: 100,
+            id: "step6"
+        }
+    ];
+
+    let currentStep = 0;
+    let currentPercent = 0;
+    let elapsedSeconds = 0;
+
+    function formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+
+        return String(minutes).padStart(2, "0") + ":" + String(secs).padStart(2, "0");
+    }
+
+    setInterval(function () {
+        elapsedSeconds++;
+        timerText.innerHTML = formatTime(elapsedSeconds);
+    }, 1000);
+
+    function updateProgress(targetPercent, message, stepId) {
+        const interval = setInterval(function () {
+            if (currentPercent >= targetPercent) {
+                clearInterval(interval);
+                return;
+            }
+
+            currentPercent++;
+
+            progressBar.style.width = currentPercent + "%";
+
+            counterText.innerHTML = currentPercent + "%";
+
+            smallCounterText.innerHTML = currentPercent + "%";
+
+            const offset = ringLength - (ringLength * currentPercent / 100);
+
+            progressRing.style.strokeDashoffset = offset;
+
+        }, 18);
+
+        progressText.innerHTML = message;
+
+        for (let i = 1; i <= 6; i++) {
+            const step = document.getElementById("step" + i);
+
+            if (step) {
+                step.classList.remove("active");
+            }
+        }
+
+        const activeStep = document.getElementById(stepId);
+
+        if (activeStep) {
+            activeStep.classList.add("active");
+        }
+
+        const activeNumber = Number(stepId.replace("step", ""));
+
+        for (let i = 1; i < activeNumber; i++) {
+            const doneStep = document.getElementById("step" + i);
+
+            if (doneStep) {
+                doneStep.classList.add("done");
+            }
+        }
+    }
+
+    function runSteps() {
+        if (currentStep >= steps.length) {
+            progressText.innerHTML = "Report is ready...";
+            return;
+        }
+
+        const step = steps[currentStep];
+
+        updateProgress(
+            step.percent,
+            step.text,
+            step.id
+        );
+
+        currentStep++;
+
+        setTimeout(runSteps, 1700);
+    }
+
+    runSteps();
+</script>
+
+{% endblock %}

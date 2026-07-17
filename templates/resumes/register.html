@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Job Seeker Registration{% endblock %}
+
+{% block content %}
+
+<section class="max-w-6xl mx-auto px-6 py-20">
+
+    <div class="grid lg:grid-cols-2 gap-12 items-center">
+
+        <div>
+
+            <span class="px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400">
+                Job Seeker Account
+            </span>
+
+            <h1 class="text-5xl font-black mt-8 leading-tight">
+                Analyze your resume and apply to matching jobs.
+            </h1>
+
+            <p class="text-gray-400 mt-6 leading-8 text-lg">
+                Your dashboard will store resume analyses, ATS scores, suggested jobs,
+                and job applications.
+            </p>
+
+        </div>
+
+        <div class="glass rounded-3xl p-10">
+
+            <h2 class="text-3xl font-black mb-3">Create Job Seeker Account</h2>
+
+            <p class="text-gray-400 mb-8">Register to analyze resumes and apply for jobs.</p>
+
+            <form method="POST" class="space-y-5">
+
+                {% csrf_token %}
+
+                <div class="grid md:grid-cols-2 gap-5">
+                    <div>{{ form.first_name }}</div>
+                    <div>{{ form.last_name }}</div>
+                </div>
+
+                <div>{{ form.username }}</div>
+                <div>{{ form.email }}</div>
+                <div>{{ form.password1 }}</div>
+                <div>{{ form.password2 }}</div>
+
+                {% if form.errors %}
+                    <div class="rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 px-5 py-4 text-sm">
+                        Please correct the highlighted registration details.
+                    </div>
+                {% endif %}
+
+                <button type="submit"
+                        class="w-full py-4 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 font-bold text-lg hover:scale-[1.02] transition">
+                    Create Account
+                </button>
+
+            </form>
+
+            <p class="text-gray-400 text-center mt-8">
+                Already registered?
+                <a href="{% url 'login' %}" class="text-cyan-400 font-semibold">Login</a>
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

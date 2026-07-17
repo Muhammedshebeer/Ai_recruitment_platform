@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Interview Questions{% endblock %}
+
+{% block content %}
+
+<section class="max-w-6xl mx-auto px-6 py-16">
+
+    <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-10">
+        <div>
+            <span class="px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-300">
+                AI Interview Prep
+            </span>
+
+            <h1 class="text-5xl font-black mt-8">{{ question_set.title }}</h1>
+
+            <p class="text-gray-400 mt-4">{{ question_set.job.company_name }} • {{ question_set.created_at|date:"d M Y" }}</p>
+        </div>
+
+        <a href="{% url 'interview_questions_history' %}"
+           class="px-6 py-3 rounded-xl border border-slate-600 hover:border-cyan-400 font-semibold">
+            History
+        </a>
+    </div>
+
+    <div class="grid lg:grid-cols-2 gap-8">
+
+        <div class="glass rounded-3xl p-8">
+            <h2 class="text-2xl font-bold mb-6">Technical Questions</h2>
+
+            <div class="space-y-4">
+                {% for question in question_set.technical_questions %}
+                    <div class="rounded-2xl bg-white/5 p-4 text-gray-300">{{ question }}</div>
+                {% empty %}
+                    <p class="text-gray-400">No technical questions generated.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="glass rounded-3xl p-8">
+            <h2 class="text-2xl font-bold mb-6">HR Questions</h2>
+
+            <div class="space-y-4">
+                {% for question in question_set.hr_questions %}
+                    <div class="rounded-2xl bg-white/5 p-4 text-gray-300">{{ question }}</div>
+                {% empty %}
+                    <p class="text-gray-400">No HR questions generated.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+
+    <div class="glass rounded-3xl p-8 mt-8">
+        <h2 class="text-2xl font-bold mb-6">Suggested Answers</h2>
+
+        <div class="space-y-4">
+            {% for answer in question_set.suggested_answers %}
+                <div class="rounded-2xl bg-white/5 p-4 text-gray-300">{{ answer }}</div>
+            {% empty %}
+                <p class="text-gray-400">No suggested answers generated.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="glass rounded-3xl p-8 mt-8">
+        <h2 class="text-2xl font-bold mb-6">Preparation Tips</h2>
+
+        <div class="space-y-4">
+            {% for tip in question_set.preparation_tips %}
+                <div class="rounded-2xl bg-white/5 p-4 text-gray-300">{{ tip }}</div>
+            {% empty %}
+                <p class="text-gray-400">No preparation tips generated.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+</section>
+
+{% endblock %}

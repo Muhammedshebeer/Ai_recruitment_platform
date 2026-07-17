@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}
+Companies
+{% endblock %}
+
+{% block content %}
+
+<section class="max-w-7xl mx-auto px-6 py-16">
+
+    <div class="mb-12">
+        <span class="px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400">
+            Companies
+        </span>
+
+        <h1 class="text-5xl font-black mt-8">
+            Hiring Companies
+        </h1>
+
+        <p class="text-gray-400 mt-4">
+            Explore approved recruiters and their open jobs.
+        </p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-8">
+
+        {% for profile in company_profiles %}
+
+            <a href="{% url 'company_detail' profile.id %}"
+               class="glass rounded-3xl p-8 block hover:border-cyan-400 transition">
+
+                {% if profile.company_logo %}
+                    <img src="{{ profile.company_logo.url }}"
+                         class="w-16 h-16 rounded-2xl object-cover mb-6">
+                {% else %}
+                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center mb-6">
+                        <i class="fa-solid fa-building text-2xl"></i>
+                    </div>
+                {% endif %}
+
+                <h3 class="text-2xl font-bold">
+                    {{ profile.company_name }}
+                </h3>
+
+                <p class="text-gray-400 mt-3">
+                    {{ profile.company_location|default:"Location not added" }}
+                </p>
+
+                <p class="text-gray-400 mt-5">
+                    {{ profile.company_about|default:"No company description added."|truncatechars:120 }}
+                </p>
+
+            </a>
+
+        {% empty %}
+
+            <div class="glass rounded-3xl p-12 md:col-span-3 text-center">
+                <i class="fa-solid fa-building text-6xl text-gray-600"></i>
+
+                <h2 class="text-3xl font-bold mt-8">
+                    No companies listed yet
+                </h2>
+
+                <p class="text-gray-400 mt-4">
+                    Approved recruiters with company profile details will appear here.
+                </p>
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Candidate Detail{% endblock %}
+
+{% block content %}
+
+<section class="max-w-6xl mx-auto px-6 py-16">
+    <div class="glass rounded-3xl p-10">
+
+        <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8">
+            <div>
+                <span class="px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400">Candidate Profile</span>
+
+                <h1 class="text-5xl font-black mt-8">{{ candidate.get_full_name|default:candidate.username }}</h1>
+                <p class="text-cyan-400 mt-4 text-xl">{{ candidate.profile.headline|default:"No headline added" }}</p>
+                <p class="text-gray-400 mt-3">{{ candidate.profile.location|default:"Location not added" }}</p>
+            </div>
+
+            <div class="text-right">
+                <p class="text-gray-400">Email</p>
+                <p class="text-gray-300 font-semibold">{{ candidate.email }}</p>
+            </div>
+        </div>
+
+        <div class="mt-10 rounded-2xl bg-white/5 p-6">
+            <h2 class="text-2xl font-bold mb-4">About</h2>
+            <p class="text-gray-300 leading-8">{{ candidate.profile.about|default:"No profile description added." }}</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-8 mt-8">
+            {% for resume in resumes %}
+                <div class="rounded-3xl bg-white/5 p-6">
+                    <div class="flex justify-between gap-4">
+                        <div>
+                            <h3 class="text-2xl font-bold">{{ resume.title }}</h3>
+                            <p class="text-gray-400 mt-2">{{ resume.target_job_title|default:"No target title" }}</p>
+                        </div>
+
+                        <span class="h-fit px-4 py-2 rounded-full bg-green-500/10 border border-green-500/30 text-green-400 font-bold">
+                            {{ resume.ats_score|default:"0" }}%
+                        </span>
+                    </div>
+
+                    <p class="text-gray-300 mt-5 leading-7">{{ resume.summary|default:"No summary." }}</p>
+
+                    <div class="flex flex-wrap gap-2 mt-5">
+                        {% for skill in resume.skills|slice:":8" %}
+                            <span class="px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-300 text-sm">{{ skill }}</span>
+                        {% endfor %}
+                    </div>
+
+                    {% if resume.pdf %}
+                        <a href="{{ resume.pdf.url }}" target="_blank" class="inline-block mt-6 px-5 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 font-semibold">
+                            Open Resume
+                        </a>
+                    {% endif %}
+                </div>
+            {% empty %}
+                <div class="rounded-3xl bg-white/5 p-6 md:col-span-2">
+                    <p class="text-gray-400">No resumes available.</p>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="mt-10">
+            <h2 class="text-2xl font-bold mb-5">Applications to Your Jobs</h2>
+
+            <div class="space-y-4">
+                {% for application in applications %}
+                    <a href="{% url 'recruiter_application_detail' application.id %}" class="block rounded-2xl bg-white/5 p-5 hover:bg-white/10 transition">
+                        <div class="flex justify-between gap-4">
+                            <div>
+                                <h3 class="font-bold">{{ application.job.title }}</h3>
+                                <p class="text-gray-400 mt-1">{{ application.created_at|date:"d M Y" }}</p>
+                            </div>
+
+                            <span class="px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-300 font-bold">
+                                {{ application.get_status_display }}
+                            </span>
+                        </div>
+                    </a>
+                {% empty %}
+                    <div class="rounded-2xl bg-white/5 p-5 text-gray-400">
+                        This candidate has not applied to your jobs yet.
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}

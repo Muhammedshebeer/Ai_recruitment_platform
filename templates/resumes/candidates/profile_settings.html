@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Candidate Profile Settings{% endblock %}
+
+{% block content %}
+
+<section class="max-w-5xl mx-auto px-6 py-16">
+    <div class="mb-10">
+        <span class="px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400">Candidate Profile</span>
+        <h1 class="text-5xl font-black mt-8">Profile Settings</h1>
+        <p class="text-gray-400 mt-4">Control how recruiters can find your candidate profile.</p>
+    </div>
+
+    <div class="glass rounded-3xl p-10">
+        <form method="POST" class="space-y-6">
+            {% csrf_token %}
+
+            <div>
+                <label class="block mb-3 text-sm text-gray-400">Headline</label>
+                {{ form.headline }}
+            </div>
+
+            <div>
+                <label class="block mb-3 text-sm text-gray-400">Location</label>
+                {{ form.location }}
+            </div>
+
+            <div>
+                <label class="block mb-3 text-sm text-gray-400">About</label>
+                {{ form.about }}
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block mb-3 text-sm text-gray-400">LinkedIn URL</label>
+                    {{ form.linkedin_url }}
+                </div>
+
+                <div>
+                    <label class="block mb-3 text-sm text-gray-400">Portfolio URL</label>
+                    {{ form.portfolio_url }}
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 rounded-2xl bg-white/5 p-5">
+                {{ form.is_searchable }}
+                <label class="text-gray-300">Allow approved recruiters to find my profile</label>
+            </div>
+
+            <button type="submit" class="w-full py-4 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 font-bold text-lg">
+                Save Profile Settings
+            </button>
+        </form>
+    </div>
+</section>
+
+{% endblock %}

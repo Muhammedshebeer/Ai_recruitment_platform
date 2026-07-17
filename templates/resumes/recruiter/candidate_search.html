@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Candidate Search{% endblock %}
+
+{% block content %}
+
+<section class="max-w-7xl mx-auto px-6 py-16">
+    <div class="mb-10">
+        <span class="px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400">Candidate Search</span>
+        <h1 class="text-5xl font-black mt-8">Search Candidate Database</h1>
+        <p class="text-gray-400 mt-4">Find searchable job seeker profiles and analyzed resumes.</p>
+    </div>
+
+    <form method="GET" class="glass rounded-3xl p-6 mb-10">
+        <div class="grid md:grid-cols-4 gap-4">
+            <input type="text" name="q" value="{{ q }}" placeholder="Name, title, summary"
+                   class="rounded-xl bg-slate-900 border border-slate-700 px-5 py-4 outline-none focus:border-blue-500">
+
+            <input type="text" name="location" value="{{ location }}" placeholder="Location"
+                   class="rounded-xl bg-slate-900 border border-slate-700 px-5 py-4 outline-none focus:border-blue-500">
+
+            <input type="text" name="skill" value="{{ skill }}" placeholder="Skill"
+                   class="rounded-xl bg-slate-900 border border-slate-700 px-5 py-4 outline-none focus:border-blue-500">
+
+            <input type="number" name="min_ats" value="{{ min_ats }}" placeholder="Minimum ATS"
+                   class="rounded-xl bg-slate-900 border border-slate-700 px-5 py-4 outline-none focus:border-blue-500">
+        </div>
+
+        <div class="mt-5 flex gap-4">
+            <button type="submit" class="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 font-semibold">Search</button>
+            <a href="{% url 'recruiter_candidate_search' %}" class="px-6 py-3 rounded-xl border border-slate-600 hover:border-cyan-400 font-semibold">Reset</a>
+        </div>
+    </form>
+
+    <div class="grid md:grid-cols-3 gap-8">
+        {% for resume in resumes %}
+            <a href="{% url 'recruiter_candidate_detail' resume.user.id %}" class="glass rounded-3xl p-8 block hover:border-cyan-400 transition">
+                <h3 class="text-2xl font-bold">{{ resume.user.get_full_name|default:resume.user.username }}</h3>
+                <p class="text-cyan-400 mt-2">{{ resume.user.profile.headline|default:resume.target_job_title }}</p>
+                <p class="text-gray-400 mt-3">{{ resume.user.profile.location|default:"Location not added" }}</p>
+
+                <div class="mt-5 flex gap-3">
+                    <span class="px-4 py-2 rounded-full bg-green-500/10 border border-green-500/30 text-green-400 font-bold">
+                        ATS {{ resume.ats_score|default:"0" }}%
+                    </span>
+
+                    <span class="px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 font-bold">
+                        {{ resume.title }}
+                    </span>
+                </div>
+
+                <p class="text-gray-400 mt-5">{{ resume.summary|default:"No summary available."|truncatechars:140 }}</p>
+            </a>
+        {% empty %}
+            <div class="glass rounded-3xl p-12 md:col-span-3 text-center">
+                <i class="fa-solid fa-users text-6xl text-gray-600"></i>
+                <h2 class="text-3xl font-bold mt-8">No candidates found</h2>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+
+{% endblock %}

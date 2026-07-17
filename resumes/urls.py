@@ -1,0 +1,103 @@
+from django.urls import path
+
+from .views import (
+    apply_job,
+    cover_letter_detail,
+    cover_letter_history,
+    dashboard,
+    generate_cover_letter,
+    generate_interview_questions,
+    home,
+    interview_questions_detail,
+    interview_questions_history,
+    job_detail,
+    job_list,
+    login_user,
+    logout_user,
+    recruiter_application_detail,
+    recruiter_applications,
+    recruiter_dashboard,
+    recruiter_job_create,
+    recruiter_job_delete,
+    recruiter_job_update,
+    recruiter_jobs,
+    recruiter_login,
+    recruiter_register,
+    register_user,
+    resume_history,
+    resume_result,
+    saved_jobs,
+    toggle_saved_job,
+    upload_resume,
+    candidate_profile_settings,
+    companies,
+    company_detail,
+    platform_admin_dashboard,
+    platform_admin_recruiters,
+    platform_admin_reported_jobs,
+    platform_admin_update_recruiter_status,
+    platform_admin_update_report_status,
+    recruiter_candidate_detail,
+    recruiter_candidate_search,
+    recruiter_company_profile,
+    recruiter_pending_status,
+    report_job,
+)
+
+urlpatterns = [
+    path("", home, name="home"),
+
+    path("register/", register_user, name="register"),
+    path("login/", login_user, name="login"),
+
+    path("recruiter/register/", recruiter_register, name="recruiter_register"),
+    path("recruiter/login/", recruiter_login, name="recruiter_login"),
+
+    path("logout/", logout_user, name="logout"),
+
+    path("dashboard/", dashboard, name="dashboard"),
+    path("upload/", upload_resume, name="upload_resume"),
+    path("result/<int:resume_id>/", resume_result, name="resume_result"),
+    path("history/", resume_history, name="resume_history"),
+
+    path("jobs/", job_list, name="job_list"),
+    path("jobs/<int:job_id>/", job_detail, name="job_detail"),
+    path("jobs/<int:job_id>/apply/", apply_job, name="apply_job"),
+    path("jobs/<int:job_id>/save/", toggle_saved_job, name="toggle_saved_job"),
+    path("saved-jobs/", saved_jobs, name="saved_jobs"),
+
+    path("jobs/<int:job_id>/cover-letter/", generate_cover_letter, name="generate_cover_letter"),
+    path("cover-letter/<int:cover_letter_id>/", cover_letter_detail, name="cover_letter_detail"),
+    path("cover-letters/", cover_letter_history, name="cover_letter_history"),
+
+    path("jobs/<int:job_id>/interview-questions/", generate_interview_questions, name="generate_interview_questions"),
+    path("interview-questions/<int:question_set_id>/", interview_questions_detail, name="interview_questions_detail"),
+    path("interview-questions/", interview_questions_history, name="interview_questions_history"),
+
+    path("recruiter/dashboard/", recruiter_dashboard, name="recruiter_dashboard"),
+    path("recruiter/jobs/", recruiter_jobs, name="recruiter_jobs"),
+    path("recruiter/jobs/create/", recruiter_job_create, name="recruiter_job_create"),
+    path("recruiter/jobs/<int:job_id>/edit/", recruiter_job_update, name="recruiter_job_update"),
+    path("recruiter/jobs/<int:job_id>/delete/", recruiter_job_delete, name="recruiter_job_delete"),
+    path("recruiter/applications/", recruiter_applications, name="recruiter_applications"),
+    path("recruiter/applications/<int:application_id>/", recruiter_application_detail, name="recruiter_application_detail"),
+    
+    
+    path("recruiter/pending-status/", recruiter_pending_status, name="recruiter_pending_status"),
+    path("profile/settings/", candidate_profile_settings, name="candidate_profile_settings"),
+
+    path("companies/", companies, name="companies"),
+    path("companies/<int:profile_id>/", company_detail, name="company_detail"),
+
+    path("jobs/<int:job_id>/report/", report_job, name="report_job"),
+
+    path("recruiter/company-profile/", recruiter_company_profile, name="recruiter_company_profile"),
+    path("recruiter/candidates/", recruiter_candidate_search, name="recruiter_candidate_search"),
+    path("recruiter/candidates/<int:user_id>/", recruiter_candidate_detail, name="recruiter_candidate_detail"),
+
+    path("platform-admin/", platform_admin_dashboard, name="platform_admin_dashboard"),
+    path("platform-admin/recruiters/", platform_admin_recruiters, name="platform_admin_recruiters"),
+    path("platform-admin/recruiters/<int:profile_id>/update-status/", platform_admin_update_recruiter_status, name="platform_admin_update_recruiter_status"),
+    path("platform-admin/reported-jobs/", platform_admin_reported_jobs, name="platform_admin_reported_jobs"),
+    path("platform-admin/reported-jobs/<int:report_id>/update-status/", platform_admin_update_report_status, name="platform_admin_update_report_status"),
+]

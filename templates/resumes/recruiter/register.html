@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block title %}Recruiter Registration{% endblock %}
+
+{% block content %}
+
+<section class="max-w-6xl mx-auto px-6 py-20">
+
+    <div class="grid lg:grid-cols-2 gap-12 items-center">
+
+        <div>
+
+            <span class="px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400">
+                Recruiter Account
+            </span>
+
+            <h1 class="text-5xl font-black mt-8 leading-tight">
+                Post jobs and manage applications from one dashboard.
+            </h1>
+
+            <p class="text-gray-400 mt-6 leading-8 text-lg">
+                Recruiters can create job posts, review applications, check AI match scores,
+                and manage application status.
+            </p>
+
+        </div>
+
+        <div class="glass rounded-3xl p-10">
+
+            <h2 class="text-3xl font-black mb-3">Create Recruiter Account</h2>
+
+            <p class="text-gray-400 mb-8">Register your company and start posting jobs.</p>
+
+            <form method="POST" class="space-y-5" enctype="multipart/form-data">
+
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+        <div class="rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 px-5 py-4 text-sm">
+            {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="grid md:grid-cols-2 gap-5">
+        <div>
+            {{ form.first_name }}
+            {% for error in form.first_name.errors %}
+                <p class="text-red-400 text-sm mt-2">{{ error }}</p>
+            {% endfor %}
+        </div>
+
+        <div>
+            {{ form.last_name }}
+            {% for error in form.last_name.errors %}
+                <p class="text-red-400 text-sm mt-2">{{ error }}</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div>
+        {{ form.username }}
+        {% for error in form.username.errors %}
+            <p class="text-red-400 text-sm mt-2">{{ error }}</p>
+        {% endfor %}
+    </div>
+
+    <div>
+        {{ form.email }}
+        {% for error in form.email.errors %}
+            <p class="text-red-400 text-sm mt-2">{{ error }}</p>
+        {% endfor %}
+    </div>
+
+    <div>
+        {{ form.company_name }}
+        {% for error in form.company_name.errors %}
+            <p class="text-red-400 text-sm mt-2">{{ error }}</p>
+        {% endfor %}
+    </div>
+
+    <div>
+    <label class="block mb-3 text-sm text-gray-400">
+        Company Document Type
+    </label>
+
+    {{ form.company_document_type }}
+
+    {% if form.company_document_type.errors %}
+        <p class="text-red-400 mt-2 text-sm">
+            {{ form.company_document_type.errors.0 }}
+        </p>
+    {% endif %}
+</div>
+
+<div>
+    <label class="block mb-3 text-sm text-gray-400">
+        Company Document
+    </label>
+
+    {{ form.company_document }}
+
+    {% if form.company_document.errors %}
+        <p class="text-red-400 mt-2 text-sm">
+            {{ form.company_document.errors.0 }}
+        </p>
+    {% endif %}
+
+    <p class="text-gray-500 text-sm mt-2">
+        Upload trade license, company registration, or other valid company document.
+        Allowed files: PDF, JPG, JPEG, PNG. Maximum size: 10 MB.
+    </p>
+</div>
+
+    <div>
+        {{ form.phone }}
+        {% for error in form.phone.errors %}
+            <p class="text-red-400 text-sm mt-2">{{ error }}</p>
+        {% endfor %}
+    </div>
+
+    <div>
+        {{ form.password1 }}
+        {% for error in form.password1.errors %}
+            <p class="text-red-400 text-sm mt-2">{{ error }}</p>
+        {% endfor %}
+    </div>
+
+    <div>
+        {{ form.password2 }}
+        {% for error in form.password2.errors %}
+            <p class="text-red-400 text-sm mt-2">{{ error }}</p>
+        {% endfor %}
+    </div>
+
+    <button type="submit"
+            class="w-full py-4 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 font-bold text-lg hover:scale-[1.02] transition">
+        Create Recruiter Account
+    </button>
+
+</form>
+
+            <p class="text-gray-400 text-center mt-8">
+                Already registered?
+                <a href="{% url 'recruiter_login' %}" class="text-cyan-400 font-semibold">Recruiter login</a>
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

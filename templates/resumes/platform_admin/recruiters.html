@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Recruiters{% endblock %}
+
+{% block content %}
+
+<section class="max-w-7xl mx-auto px-6 py-16">
+    <div class="mb-10">
+        <span class="px-4 py-2 rounded-full bg-red-500/10 border border-red-500/30 text-red-300">Admin</span>
+        <h1 class="text-5xl font-black mt-8">Manage Recruiters</h1>
+        <p class="text-gray-400 mt-4">Approve, reject, or block recruiter accounts.</p>
+    </div>
+
+    <form method="GET" class="glass rounded-3xl p-6 mb-8">
+        <div class="grid md:grid-cols-3 gap-4">
+            <input type="text" name="q" value="{{ q }}" placeholder="Search recruiter/company"
+                   class="rounded-xl bg-slate-900 border border-slate-700 px-5 py-4 outline-none focus:border-blue-500">
+
+            <select name="status" class="rounded-xl bg-slate-900 border border-slate-700 px-5 py-4 outline-none focus:border-blue-500">
+                <option value="">All Status</option>
+                {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+
+            <button type="submit" class="rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 font-semibold">Filter</button>
+        </div>
+    </form>
+
+    <div class="glass rounded-3xl overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full min-w-[1000px]">
+                <thead class="bg-white/5">
+                    <tr>
+                        <th class="text-left px-6 py-5 text-gray-400 uppercase text-xs tracking-widest">Recruiter</th>
+                        <th class="text-left px-6 py-5 text-gray-400 uppercase text-xs tracking-widest">Company</th>
+                        <th class="text-left px-6 py-5 text-gray-400 uppercase text-xs tracking-widest">
+    Document
+</th>
+                        <th class="text-left px-6 py-5 text-gray-400 uppercase text-xs tracking-widest">Status</th>
+                        <th class="text-left px-6 py-5 text-gray-400 uppercase text-xs tracking-widest">Update</th>
+                    </tr>
+                </thead>
+
+                <tbody class="divide-y divide-slate-700">
+                    {% for profile in recruiters %}
+                        <tr>
+                            <td class="px-6 py-5">
+                                <div class="font-bold">{{ profile.user.username }}</div>
+                                <div class="text-gray-500 text-sm mt-1">{{ profile.user.email }}</div>
+                            </td>
+
+                            <td class="px-6 py-5 text-gray-400">{{ profile.company_name|default:"-" }}</td>
+
+                            <td class="px-6 py-5">
+    {% if profile.company_document %}
+        <a href="{{ profile.company_document.url }}"
+           target="_blank"
+           class="text-cyan-400 font-semibold">
+            View Document
+        </a>
+
+        <p class="text-gray-500 text-sm mt-1">
+            {{ profile.company_document_type }}
+        </p>
+    {% else %}
+        <span class="text-gray-500">
+            No document
+        </span>
+    {% endif %}
+</td>
+
+                            <td class="px-6 py-5">
+                                <span class="px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 font-bold">
+                                    {{ profile.get_recruiter_status_display }}
+                                </span>
+                            </td>
+
+                            <td class="px-6 py-5">
+                                <form method="POST" action="{% url 'platform_admin_update_recruiter_status' profile.id %}" class="grid grid-cols-3 gap-3">
+                                    {% csrf_token %}
+
+                                    <select name="recruiter_status" class="rounded-xl bg-slate-900 border border-slate-700 px-3 py-3 outline-none focus:border-blue-500">
+                                        {% for value, label in status_choices %}
+                                            <option value="{{ value }}" {% if profile.recruiter_status == value %}selected{% endif %}>{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+
+                                    <input type="text" name="recruiter_status_note" value="{{ profile.recruiter_status_note }}" placeholder="Note"
+                                           class="rounded-xl bg-slate-900 border border-slate-700 px-3 py-3 outline-none focus:border-blue-500">
+
+                                    <button type="submit" class="rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 font-semibold">Save</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="4" class="px-6 py-12 text-center text-gray-400">No recruiters found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

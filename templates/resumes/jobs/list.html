@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}Jobs{% endblock %}
+
+{% block content %}
+
+<section class="max-w-7xl mx-auto px-6 py-16">
+
+    <div class="mb-12">
+        <span class="px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400">
+            Job Board
+        </span>
+
+        <h1 class="text-5xl font-black mt-8">Find Jobs</h1>
+
+        <p class="text-gray-400 mt-4">Search jobs by title, company, location, skill, salary, and date posted.</p>
+    </div>
+
+    <form method="GET" class="glass rounded-3xl p-6 mb-10">
+
+        <div class="grid lg:grid-cols-4 gap-4">
+
+            <input type="text"
+                   name="q"
+                   value="{{ q }}"
+                   placeholder="Search title, company, keyword"
+                   class="rounded-xl bg-slate-900 border border-slate-700 px-5 py-4 outline-none focus:border-blue-500">
+
+            <input type="text"
+                   name="location"
+                   value="{{ location }}"
+                   placeholder="Location"
+                   class="rounded-xl bg-slate-900 border border-slate-700 px-5 py-4 outline-none focus:border-blue-500">
+
+            <input type="text"
+                   name="skill"
+                   value="{{ skill }}"
+                   placeholder="Skill, example: Django"
+                   class="rounded-xl bg-slate-900 border border-slate-700 px-5 py-4 outline-none focus:border-blue-500">
+
+            <select name="job_type"
+                    class="rounded-xl bg-slate-900 border border-slate-700 px-5 py-4 outline-none focus:border-blue-500">
+                <option value="">All Job Types</option>
+
+                {% for value, label in job_type_choices %}
+                    <option value="{{ value }}" {% if job_type == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <input type="date"
+                   name="date_from"
+                   value="{{ date_from }}"
+                   class="rounded-xl bg-slate-900 border border-slate-700 px-5 py-4 outline-none focus:border-blue-500">
+
+            <input type="date"
+                   name="date_to"
+                   value="{{ date_to }}"
+                   class="rounded-xl bg-slate-900 border border-slate-700 px-5 py-4 outline-none focus:border-blue-500">
+
+            <input type="number"
+                   name="salary_min"
+                   value="{{ salary_min }}"
+                   placeholder="Min Salary"
+                   class="rounded-xl bg-slate-900 border border-slate-700 px-5 py-4 outline-none focus:border-blue-500">
+
+            <input type="number"
+                   name="salary_max"
+                   value="{{ salary_max }}"
+                   placeholder="Max Salary"
+                   class="rounded-xl bg-slate-900 border border-slate-700 px-5 py-4 outline-none focus:border-blue-500">
+
+        </div>
+
+        <div class="flex gap-4 mt-5">
+            <button type="submit"
+                    class="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 font-semibold">
+                Search Jobs
+            </button>
+
+            <a href="{% url 'job_list' %}"
+               class="px-6 py-3 rounded-xl border border-slate-600 hover:border-blue-500 transition">
+                Reset
+            </a>
+        </div>
+
+    </form>
+
+    <div class="grid md:grid-cols-3 gap-8">
+
+        {% for job in jobs %}
+
+            <a href="{% url 'job_detail' job.id %}" class="glass rounded-3xl p-8 block hover:border-cyan-400 transition">
+
+                <div class="flex justify-between gap-4">
+                    <span class="text-sm text-cyan-400 font-semibold">{{ job.get_job_type_display }}</span>
+                    <span class="text-sm text-gray-400">{{ job.created_at|date:"d M Y" }}</span>
+                </div>
+
+                <h3 class="font-bold text-2xl mt-4">{{ job.title }}</h3>
+
+                <p class="text-gray-400 mt-3">{{ job.company_name }}</p>
+
+                <div class="flex items-center gap-2 text-gray-400 mt-5">
+                    <i class="fa-solid fa-location-dot"></i>
+                    {{ job.location }}
+                </div>
+
+                <div class="flex flex-wrap gap-2 mt-6">
+                    {% for skill in job.skills_required|slice:":4" %}
+                        <span class="px-3 py-1 rounded-full bg-white/5 text-gray-300 text-sm">{{ skill }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="mt-6 flex justify-between items-center">
+                    <span class="text-gray-400 text-sm">{{ job.total_applications }} applications</span>
+                    <span class="text-cyan-400 font-semibold">View Details</span>
+                </div>
+
+            </a>
+
+        {% empty %}
+
+            <div class="glass rounded-3xl p-12 md:col-span-3 text-center">
+                <i class="fa-solid fa-magnifying-glass text-6xl text-gray-600"></i>
+                <h2 class="text-3xl font-bold mt-8">No jobs found</h2>
+                <p class="text-gray-400 mt-4">Try changing the search filters.</p>
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
+{% endblock %}

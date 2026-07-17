@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Saved Jobs{% endblock %}
+
+{% block content %}
+
+<section class="max-w-7xl mx-auto px-6 py-16">
+
+    <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-12">
+        <div>
+            <span class="px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400">
+                Saved Jobs
+            </span>
+
+            <h1 class="text-5xl font-black mt-8">Jobs Saved for Later</h1>
+
+            <p class="text-gray-400 mt-4">Review the jobs you saved before applying.</p>
+        </div>
+
+        <a href="{% url 'job_list' %}"
+           class="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 font-semibold">
+            Browse Jobs
+        </a>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-8">
+
+        {% for saved in saved_jobs %}
+
+            <div class="glass rounded-3xl p-8">
+
+                <div class="text-sm text-cyan-400 font-semibold">{{ saved.job.get_job_type_display }}</div>
+
+                <h3 class="font-bold text-2xl mt-4">{{ saved.job.title }}</h3>
+
+                <p class="text-gray-400 mt-3">{{ saved.job.company_name }}</p>
+
+                <div class="flex items-center gap-2 text-gray-400 mt-5">
+                    <i class="fa-solid fa-location-dot"></i>
+                    {{ saved.job.location }}
+                </div>
+
+                <div class="flex gap-3 mt-7">
+                    <a href="{% url 'job_detail' saved.job.id %}"
+                       class="px-5 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 font-semibold">
+                        View
+                    </a>
+
+                    <a href="{% url 'toggle_saved_job' saved.job.id %}"
+                       class="px-5 py-3 rounded-xl border border-slate-600 hover:border-red-400 font-semibold">
+                        Remove
+                    </a>
+                </div>
+
+            </div>
+
+        {% empty %}
+
+            <div class="glass rounded-3xl p-12 md:col-span-3 text-center">
+                <i class="fa-solid fa-bookmark text-6xl text-gray-600"></i>
+                <h2 class="text-3xl font-bold mt-8">No saved jobs yet</h2>
+                <p class="text-gray-400 mt-4">Save jobs from the job board to view them here.</p>
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Recruiter Approval Status{% endblock %}
+
+{% block content %}
+
+<section class="max-w-4xl mx-auto px-6 py-20">
+    <div class="glass rounded-3xl p-10 text-center">
+
+        <div class="w-20 h-20 rounded-3xl bg-yellow-500/10 border border-yellow-500/30 flex items-center justify-center mx-auto">
+            <i class="fa-solid fa-clock text-4xl text-yellow-300"></i>
+        </div>
+
+        <h1 class="text-4xl font-black mt-8">Recruiter Account Status</h1>
+
+        <p class="text-gray-400 mt-4">Your recruiter account status is currently:</p>
+
+        <div class="inline-block mt-6 px-6 py-3 rounded-xl bg-blue-500/10 border border-blue-500/30 text-blue-300 font-bold">
+            {{ profile.get_recruiter_status_display }}
+        </div>
+
+        {% if profile.recruiter_status_note %}
+            <div class="mt-8 rounded-2xl bg-white/5 p-5 text-gray-300">
+                {{ profile.recruiter_status_note }}
+            </div>
+        {% endif %}
+
+        {% if profile.recruiter_status == "pending" %}
+
+    <p class="text-gray-400 mt-8">
+        Your recruiter account is waiting for admin approval.
+        You will receive an email once your account is approved.
+    </p>
+
+{% elif profile.recruiter_status == "rejected" %}
+
+    <p class="text-red-300 mt-8">
+        Your recruiter account was rejected.
+        Please contact support for more details.
+    </p>
+
+{% elif profile.recruiter_status == "blocked" %}
+
+    <p class="text-red-300 mt-8">
+        Your recruiter account is blocked.
+        Please contact admin.
+    </p>
+
+{% endif %}
+
+        <a href="{% url 'logout' %}"
+           class="inline-block mt-8 px-6 py-3 rounded-xl border border-slate-600 hover:border-red-400 font-semibold">
+            Logout
+        </a>
+    </div>
+</section>
+
+{% endblock %}

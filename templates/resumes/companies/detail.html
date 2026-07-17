@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ profile.company_name }}
+{% endblock %}
+
+{% block content %}
+
+<section class="max-w-6xl mx-auto px-6 py-16">
+
+    <div class="glass rounded-3xl p-10">
+
+        <div class="flex flex-col md:flex-row gap-8 md:items-center">
+
+            {% if profile.company_logo %}
+                <img src="{{ profile.company_logo.url }}"
+                     class="w-24 h-24 rounded-3xl object-cover">
+            {% else %}
+                <div class="w-24 h-24 rounded-3xl bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center">
+                    <i class="fa-solid fa-building text-4xl"></i>
+                </div>
+            {% endif %}
+
+            <div>
+                <h1 class="text-5xl font-black">
+                    {{ profile.company_name }}
+                </h1>
+
+                <p class="text-gray-400 mt-3">
+                    {{ profile.company_location|default:"Location not added" }}
+                </p>
+
+                {% if profile.company_website %}
+                    <a href="{{ profile.company_website }}"
+                       target="_blank"
+                       class="inline-block mt-4 text-cyan-400 font-semibold">
+                        Visit Website
+                    </a>
+                {% endif %}
+            </div>
+
+        </div>
+
+        <div class="mt-10 rounded-2xl bg-white/5 p-6">
+            <h2 class="text-2xl font-bold mb-4">
+                About Company
+            </h2>
+
+            <p class="text-gray-300 leading-8">
+                {{ profile.company_about|default:"No company description added." }}
+            </p>
+        </div>
+
+        <div class="mt-12">
+            <h2 class="text-3xl font-black mb-8">
+                Open Jobs
+            </h2>
+
+            <div class="grid md:grid-cols-2 gap-6">
+
+                {% for job in jobs %}
+
+                    <a href="{% url 'job_detail' job.id %}"
+                       class="rounded-3xl bg-white/5 p-6 hover:bg-white/10 transition">
+
+                        <span class="text-cyan-400 font-semibold">
+                            {{ job.get_job_type_display }}
+                        </span>
+
+                        <h3 class="text-2xl font-bold mt-4">
+                            {{ job.title }}
+                        </h3>
+
+                        <p class="text-gray-400 mt-3">
+                            {{ job.location }}
+                        </p>
+
+                    </a>
+
+                {% empty %}
+
+                    <div class="rounded-3xl bg-white/5 p-6 md:col-span-2 text-gray-400">
+                        No open jobs at the moment.
+                    </div>
+
+                {% endfor %}
+
+            </div>
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Reported Jobs{% endblock %}
+
+{% block content %}
+
+<section class="max-w-7xl mx-auto px-6 py-16">
+    <div class="mb-10">
+        <span class="px-4 py-2 rounded-full bg-red-500/10 border border-red-500/30 text-red-300">Job Reports</span>
+        <h1 class="text-5xl font-black mt-8">Reported Jobs</h1>
+        <p class="text-gray-400 mt-4">Review and resolve reported job posts.</p>
+    </div>
+
+    <form method="GET" class="glass rounded-3xl p-6 mb-8">
+        <div class="grid md:grid-cols-3 gap-4">
+            <select name="status" class="rounded-xl bg-slate-900 border border-slate-700 px-5 py-4 outline-none focus:border-blue-500">
+                <option value="">All Status</option>
+                {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+
+            <button type="submit" class="rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 font-semibold">Filter</button>
+            <a href="{% url 'platform_admin_reported_jobs' %}" class="text-center rounded-xl border border-slate-600 py-4 font-semibold">Reset</a>
+        </div>
+    </form>
+
+    <div class="space-y-6">
+        {% for report in reports %}
+            <div class="glass rounded-3xl p-8">
+                <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+                    <div>
+                        <h3 class="text-2xl font-bold">{{ report.job.title }}</h3>
+                        <p class="text-gray-400 mt-2">{{ report.job.company_name }}</p>
+
+                        <div class="flex gap-3 mt-5">
+                            <span class="px-4 py-2 rounded-full bg-red-500/10 border border-red-500/30 text-red-300 font-bold">{{ report.get_reason_display }}</span>
+                            <span class="px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-300 font-bold">{{ report.get_status_display }}</span>
+                        </div>
+
+                        <p class="text-gray-300 mt-5">{{ report.details|default:"No details provided." }}</p>
+                    </div>
+
+                    <a href="{% url 'job_detail' report.job.id %}" class="text-cyan-400 font-semibold">Open Job</a>
+                </div>
+
+                <form method="POST" action="{% url 'platform_admin_update_report_status' report.id %}" class="grid md:grid-cols-3 gap-4 mt-6">
+                    {% csrf_token %}
+
+                    <select name="status" class="rounded-xl bg-slate-900 border border-slate-700 px-5 py-4 outline-none focus:border-blue-500">
+                        {% for value, label in status_choices %}
+                            <option value="{{ value }}" {% if report.status == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <input type="text" name="admin_notes" value="{{ report.admin_notes }}" placeholder="Admin notes"
+                           class="rounded-xl bg-slate-900 border border-slate-700 px-5 py-4 outline-none focus:border-blue-500">
+
+                    <button type="submit" class="rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 font-semibold">Update</button>
+                </form>
+            </div>
+        {% empty %}
+            <div class="glass rounded-3xl p-12 text-center">
+                <i class="fa-solid fa-flag text-6xl text-gray-600"></i>
+                <h2 class="text-3xl font-bold mt-8">No reported jobs</h2>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+
+{% endblock %}

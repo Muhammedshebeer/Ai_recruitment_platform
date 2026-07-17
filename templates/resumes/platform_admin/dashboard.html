@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Platform Admin{% endblock %}
+
+{% block content %}
+
+<section class="max-w-7xl mx-auto px-6 py-16">
+
+    <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-12">
+        <div>
+            <span class="px-4 py-2 rounded-full bg-red-500/10 border border-red-500/30 text-red-300">Platform Admin</span>
+            <h1 class="text-5xl font-black mt-8">Admin Dashboard</h1>
+            <p class="text-gray-400 mt-4">Monitor platform users, recruiters, jobs, applications, and reports.</p>
+        </div>
+
+        <div class="flex gap-4">
+            <a href="{% url 'platform_admin_recruiters' %}" class="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 font-semibold">Manage Recruiters</a>
+            <a href="{% url 'platform_admin_reported_jobs' %}" class="px-6 py-3 rounded-xl border border-slate-600 hover:border-red-400 font-semibold">Job Reports</a>
+        </div>
+    </div>
+
+    <div class="grid md:grid-cols-4 gap-6">
+        <div class="glass rounded-3xl p-6"><p class="text-gray-400">Users</p><h2 class="text-4xl font-black mt-4 text-blue-400">{{ total_users }}</h2></div>
+        <div class="glass rounded-3xl p-6"><p class="text-gray-400">Job Seekers</p><h2 class="text-4xl font-black mt-4 text-green-400">{{ total_job_seekers }}</h2></div>
+        <div class="glass rounded-3xl p-6"><p class="text-gray-400">Recruiters</p><h2 class="text-4xl font-black mt-4 text-cyan-400">{{ total_recruiters }}</h2></div>
+        <div class="glass rounded-3xl p-6"><p class="text-gray-400">Pending Recruiters</p><h2 class="text-4xl font-black mt-4 text-yellow-400">{{ pending_recruiters }}</h2></div>
+        <div class="glass rounded-3xl p-6"><p class="text-gray-400">Resumes</p><h2 class="text-4xl font-black mt-4 text-purple-400">{{ total_resumes }}</h2></div>
+        <div class="glass rounded-3xl p-6"><p class="text-gray-400">Jobs</p><h2 class="text-4xl font-black mt-4 text-blue-400">{{ total_jobs }}</h2></div>
+        <div class="glass rounded-3xl p-6"><p class="text-gray-400">Applications</p><h2 class="text-4xl font-black mt-4 text-green-400">{{ total_applications }}</h2></div>
+        <div class="glass rounded-3xl p-6"><p class="text-gray-400">Open Reports</p><h2 class="text-4xl font-black mt-4 text-red-400">{{ open_reports }}</h2></div>
+    </div>
+
+    <div class="grid lg:grid-cols-2 gap-8 mt-10">
+        <div class="glass rounded-3xl p-8">
+            <h2 class="text-2xl font-bold mb-6">Recruiter Status</h2>
+            <canvas id="recruiterStatusChart"></canvas>
+        </div>
+
+        <div class="glass rounded-3xl p-8">
+            <h2 class="text-2xl font-bold mb-6">Application Status</h2>
+            <canvas id="applicationStatusChart"></canvas>
+        </div>
+    </div>
+
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+
+{{ recruiter_status_counts|json_script:"recruiter-status-counts" }}
+{{ application_status_counts|json_script:"application-status-counts" }}
+
+<script>
+const recruiterStatusCounts = JSON.parse(document.getElementById("recruiter-status-counts").textContent);
+const applicationStatusCounts = JSON.parse(document.getElementById("application-status-counts").textContent);
+
+const recruiterCanvas = document.getElementById("recruiterStatusChart");
+
+if (recruiterCanvas) {
+    new Chart(recruiterCanvas, {
+        type: "doughnut",
+        data: {
+            labels: ["Pending", "Approved", "Rejected", "Blocked"],
+            datasets: [{
+                data: [
+                    recruiterStatusCounts.pending || 0,
+                    recruiterStatusCounts.approved || 0,
+                    recruiterStatusCounts.rejected || 0,
+                    recruiterStatusCounts.blocked || 0
+                ],
+                backgroundColor: ["#EAB308", "#22C55E", "#EF4444", "#64748B"]
+            }]
+        }
+    });
+}
+
+const applicationCanvas = document.getElementById("applicationStatusChart");
+
+if (applicationCanvas) {
+    new Chart(applicationCanvas, {
+        type: "doughnut",
+        data: {
+            labels: ["Submitted", "Reviewed", "Shortlisted", "Interview", "Rejected", "Hired"],
+            datasets: [{
+                data: [
+                    applicationStatusCounts.submitted || 0,
+                    applicationStatusCounts.reviewed || 0,
+                    applicationStatusCounts.shortlisted || 0,
+                    applicationStatusCounts.interview || 0,
+                    applicationStatusCounts.rejected || 0,
+                    applicationStatusCounts.hired || 0
+                ],
+                backgroundColor: ["#3B82F6", "#06B6D4", "#22C55E", "#A855F7", "#EF4444", "#EAB308"]
+            }]
+        }
+    });
+}
+</script>
+
+{% endblock %}

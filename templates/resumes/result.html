@@ -1,0 +1,279 @@
+{% extends "base.html" %}
+
+{% block title %}Resume Result{% endblock %}
+
+{% block content %}
+
+<section class="max-w-7xl mx-auto px-6 py-16">
+
+    <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-12">
+
+        <div>
+            <span class="px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400">
+                ATS Result Dashboard
+            </span>
+
+            <h1 class="text-5xl font-black mt-8">{{ resume.title }}</h1>
+
+            <p class="text-gray-400 mt-4">Uploaded on {{ resume.created_at|date:"d M Y, h:i A" }}</p>
+        </div>
+
+        <div class="flex gap-4">
+            <a href="{% url 'upload_resume' %}"
+               class="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 font-semibold">
+                New Analysis
+            </a>
+
+            <a href="{% url 'job_list' %}"
+               class="px-6 py-3 rounded-xl border border-slate-600 hover:border-blue-500 transition">
+                Browse Jobs
+            </a>
+        </div>
+
+    </div>
+
+    <div class="grid lg:grid-cols-3 gap-8">
+
+        <div class="glass rounded-3xl p-8">
+            <h2 class="text-2xl font-bold mb-6">ATS Score</h2>
+
+            <div class="flex items-center justify-center">
+                <div class="relative w-56 h-56">
+                    <canvas id="atsChart"></canvas>
+
+                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                        <div class="text-5xl font-black text-cyan-400">{{ resume.ats_score|default:"0" }}%</div>
+                        <div class="text-gray-400 mt-2">ATS Score</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass rounded-3xl p-8">
+            <h2 class="text-2xl font-bold mb-6">Job Match Score</h2>
+
+            <div class="flex items-center justify-center">
+                <div class="relative w-56 h-56">
+                    <canvas id="matchChart"></canvas>
+
+                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                        <div class="text-5xl font-black text-green-400">{{ resume.job_match_score|default:"0" }}%</div>
+                        <div class="text-gray-400 mt-2">Job Match</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass rounded-3xl p-8">
+            <h2 class="text-2xl font-bold mb-6">Target Job</h2>
+
+            <p class="text-cyan-400 font-bold text-xl">{{ resume.target_job_title|default:"Not provided" }}</p>
+
+            <p class="text-gray-400 mt-4">
+                {{ resume.job_match_feedback|default:"No job match feedback generated." }}
+            </p>
+        </div>
+
+    </div>
+
+    <div class="glass rounded-3xl p-8 mt-8">
+
+        <h2 class="text-2xl font-bold mb-6">AI Summary</h2>
+
+        <p class="text-gray-300 leading-8">
+            {{ resume.summary|default:"No summary generated." }}
+        </p>
+
+        {% if resume.improved_summary %}
+            <div class="mt-8 rounded-2xl bg-green-500/10 border border-green-500/30 p-5">
+                <h3 class="font-bold text-green-400 mb-3">Improved Professional Summary</h3>
+                <p class="text-gray-300 leading-8">{{ resume.improved_summary }}</p>
+            </div>
+        {% endif %}
+
+    </div>
+
+    <div class="grid lg:grid-cols-2 gap-8 mt-8">
+
+        <div class="glass rounded-3xl p-8">
+            <h2 class="text-2xl font-bold mb-6">Skills Detected</h2>
+
+            <div class="flex flex-wrap gap-3">
+                {% for skill in resume.skills %}
+                    <span class="px-4 py-2 rounded-full bg-green-500/10 border border-green-500/30 text-green-400 font-semibold">
+                        {{ skill }}
+                    </span>
+                {% empty %}
+                    <p class="text-gray-400">No skills detected.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="glass rounded-3xl p-8">
+            <h2 class="text-2xl font-bold mb-6">Missing Skills</h2>
+
+            <div class="flex flex-wrap gap-3">
+                {% for skill in resume.missing_skills %}
+                    <span class="px-4 py-2 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 font-semibold">
+                        {{ skill }}
+                    </span>
+                {% empty %}
+                    <p class="text-gray-400">No missing skills found.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+
+    <div class="grid lg:grid-cols-2 gap-8 mt-8">
+
+        <div class="glass rounded-3xl p-8">
+
+            <h2 class="text-2xl font-bold mb-6">What to Add to Improve Score</h2>
+
+            <div class="space-y-4">
+                {% for item in resume.things_to_add %}
+                    <div class="flex gap-4 p-4 rounded-2xl bg-white/5">
+                        <i class="fa-solid fa-plus-circle text-green-400 mt-1"></i>
+                        <p class="text-gray-300">{{ item }}</p>
+                    </div>
+                {% empty %}
+                    <p class="text-gray-400">No additional items suggested.</p>
+                {% endfor %}
+            </div>
+
+        </div>
+
+        <div class="glass rounded-3xl p-8">
+
+            <h2 class="text-2xl font-bold mb-6">Weak Resume Sections</h2>
+
+            <div class="space-y-4">
+                {% for item in resume.weak_sections %}
+                    <div class="flex gap-4 p-4 rounded-2xl bg-white/5">
+                        <i class="fa-solid fa-triangle-exclamation text-yellow-400 mt-1"></i>
+                        <p class="text-gray-300">{{ item }}</p>
+                    </div>
+                {% empty %}
+                    <p class="text-gray-400">No weak sections detected.</p>
+                {% endfor %}
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="glass rounded-3xl p-8 mt-8">
+
+        <h2 class="text-2xl font-bold mb-4">Suggested Resume Bullet Points</h2>
+
+        <p class="text-gray-400 mb-6">
+            Only add bullet points that are true to your real experience.
+        </p>
+
+        <div class="space-y-4">
+            {% for bullet in resume.resume_bullet_points %}
+                <div class="flex gap-4 p-4 rounded-2xl bg-white/5">
+                    <i class="fa-solid fa-circle-check text-cyan-400 mt-1"></i>
+                    <p class="text-gray-300">{{ bullet }}</p>
+                </div>
+            {% empty %}
+                <p class="text-gray-400">No bullet points generated.</p>
+            {% endfor %}
+        </div>
+
+    </div>
+
+    <div class="glass rounded-3xl p-8 mt-8">
+
+        <h2 class="text-2xl font-bold mb-6">ATS Keywords to Add</h2>
+
+        <div class="flex flex-wrap gap-3">
+            {% for keyword in resume.keywords_to_add %}
+                <span class="px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 font-semibold">
+                    {{ keyword }}
+                </span>
+            {% empty %}
+                <p class="text-gray-400">No keywords suggested.</p>
+            {% endfor %}
+        </div>
+
+    </div>
+
+    <div class="glass rounded-3xl p-8 mt-8">
+
+        <div class="flex justify-between items-end gap-6 mb-8">
+            <div>
+                <h2 class="text-2xl font-bold">Matching Jobs</h2>
+                <p class="text-gray-400 mt-2">Suggested based on your detected resume skills.</p>
+            </div>
+
+            <a href="{% url 'job_list' %}" class="text-cyan-400 font-semibold">View all</a>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-5">
+            {% for item in matched_jobs %}
+                <a href="{% url 'job_detail' item.job.id %}" class="block rounded-2xl bg-white/5 p-5 hover:bg-white/10 transition">
+                    <div class="flex justify-between gap-4">
+                        <div>
+                            <h3 class="font-bold text-xl">{{ item.job.title }}</h3>
+                            <p class="text-gray-400 mt-2">{{ item.job.company_name }} • {{ item.job.location }}</p>
+                        </div>
+
+                        <span class="h-fit px-3 py-2 rounded-full bg-green-500/10 border border-green-500/30 text-green-400 font-bold">
+                            {{ item.score }}% Match
+                        </span>
+                    </div>
+                </a>
+            {% empty %}
+                <div class="lg:col-span-2 text-center py-10">
+                    <i class="fa-solid fa-magnifying-glass text-5xl text-gray-600"></i>
+                    <h3 class="font-bold text-xl mt-6">No matching jobs yet</h3>
+                    <p class="text-gray-400 mt-2">Try adding more skills in your resume or browse all jobs.</p>
+                </div>
+            {% endfor %}
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const atsScore = Number("{{ resume.ats_score|default:'0' }}");
+const matchScore = Number("{{ resume.job_match_score|default:'0' }}");
+
+function buildDoughnut(canvasId, score, color) {
+    const canvas = document.getElementById(canvasId);
+
+    if (!canvas) {
+        return;
+    }
+
+    new Chart(canvas, {
+        type: "doughnut",
+        data: {
+            labels: ["Score", "Remaining"],
+            datasets: [{
+                data: [score, Math.max(100 - score, 0)],
+                backgroundColor: [color, "#1E293B"],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            cutout: "75%",
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+}
+
+buildDoughnut("atsChart", atsScore, "#06B6D4");
+buildDoughnut("matchChart", matchScore, "#22C55E");
+</script>
+{% endblock %}

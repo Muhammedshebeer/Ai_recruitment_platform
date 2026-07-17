@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}My Jobs{% endblock %}
+
+{% block content %}
+
+<section class="max-w-7xl mx-auto px-6 py-16">
+
+    <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-12">
+        <div>
+            <span class="px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400">
+                Recruiter Jobs
+            </span>
+
+            <h1 class="text-5xl font-black mt-8">My Job Posts</h1>
+
+            <p class="text-gray-400 mt-4">Create, edit, close, or delete your job posts.</p>
+        </div>
+
+        <a href="{% url 'recruiter_job_create' %}"
+           class="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 font-semibold">
+            Create Job Post
+        </a>
+    </div>
+
+    <div class="glass rounded-3xl overflow-hidden">
+
+        {% if jobs %}
+
+            <div class="overflow-x-auto">
+                <table class="w-full min-w-[1000px]">
+                    <thead class="bg-white/5">
+                        <tr>
+                            <th class="text-left px-6 py-5 text-gray-400 uppercase text-xs tracking-widest">Job</th>
+                            <th class="text-left px-6 py-5 text-gray-400 uppercase text-xs tracking-widest">Location</th>
+                            <th class="text-left px-6 py-5 text-gray-400 uppercase text-xs tracking-widest">Status</th>
+                            <th class="text-left px-6 py-5 text-gray-400 uppercase text-xs tracking-widest">Applications</th>
+                            <th class="text-right px-6 py-5 text-gray-400 uppercase text-xs tracking-widest">Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody class="divide-y divide-slate-700">
+                        {% for job in jobs %}
+                            <tr class="hover:bg-white/5 transition">
+                                <td class="px-6 py-5">
+                                    <div class="font-bold">{{ job.title }}</div>
+                                    <div class="text-gray-500 text-sm mt-1">{{ job.company_name }}</div>
+                                </td>
+
+                                <td class="px-6 py-5 text-gray-400">{{ job.location }}</td>
+
+                                <td class="px-6 py-5">
+                                    <span class="px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 font-bold">
+                                        {{ job.get_status_display }}
+                                    </span>
+                                </td>
+
+                                <td class="px-6 py-5 text-gray-400">{{ job.total_applications }}</td>
+
+                                <td class="px-6 py-5 text-right space-x-2">
+                                    <a href="{% url 'job_detail' job.id %}" class="text-cyan-400 font-semibold">View</a>
+                                    <a href="{% url 'recruiter_job_update' job.id %}" class="text-green-400 font-semibold">Edit</a>
+                                    <a href="{% url 'recruiter_job_delete' job.id %}" class="text-red-400 font-semibold">Delete</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        {% else %}
+
+            <div class="text-center py-20">
+                <i class="fa-solid fa-briefcase text-6xl text-gray-600"></i>
+                <h2 class="text-3xl font-bold mt-8">No jobs posted yet</h2>
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</section>
+
+{% endblock %}

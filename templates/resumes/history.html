@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Resume History{% endblock %}
+
+{% block content %}
+
+<section class="max-w-7xl mx-auto px-6 py-16">
+
+    <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-12">
+
+        <div>
+            <span class="px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400">
+                Resume History
+            </span>
+
+            <h1 class="text-5xl font-black mt-8">Uploaded Resumes</h1>
+
+            <p class="text-gray-400 mt-4">View your previous resume checks and ATS scores.</p>
+        </div>
+
+        <a href="{% url 'upload_resume' %}"
+           class="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 font-semibold">
+            Upload New Resume
+        </a>
+
+    </div>
+
+    <div class="glass rounded-3xl overflow-hidden">
+
+        {% if resumes %}
+
+            <div class="overflow-x-auto">
+                <table class="w-full min-w-[900px]">
+                    <thead class="bg-white/5">
+                        <tr>
+                            <th class="text-left px-6 py-5 text-gray-400 uppercase text-xs tracking-widest">Resume</th>
+                            <th class="text-left px-6 py-5 text-gray-400 uppercase text-xs tracking-widest">ATS Score</th>
+                            <th class="text-left px-6 py-5 text-gray-400 uppercase text-xs tracking-widest">Summary</th>
+                            <th class="text-left px-6 py-5 text-gray-400 uppercase text-xs tracking-widest">Uploaded</th>
+                            <th class="text-right px-6 py-5 text-gray-400 uppercase text-xs tracking-widest">Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody class="divide-y divide-slate-700">
+                        {% for resume in resumes %}
+                            <tr class="hover:bg-white/5 transition">
+                                <td class="px-6 py-5">
+                                    <div class="font-bold">{{ resume.title }}</div>
+                                    <div class="text-gray-500 text-sm mt-1">ID: {{ resume.id }}</div>
+                                </td>
+
+                                <td class="px-6 py-5">
+                                    <span class="px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 font-bold">
+                                        {{ resume.ats_score|default:"0" }}%
+                                    </span>
+                                </td>
+
+                                <td class="px-6 py-5 text-gray-400 max-w-md">
+                                    {{ resume.summary|truncatechars:100|default:"No summary" }}
+                                </td>
+
+                                <td class="px-6 py-5 text-gray-400">{{ resume.created_at|date:"d M Y" }}</td>
+
+                                <td class="px-6 py-5 text-right">
+                                    <a href="{% url 'resume_result' resume.id %}"
+                                       class="px-5 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 font-semibold inline-block">
+                                        View Result
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        {% else %}
+
+            <div class="text-center py-20">
+                <i class="fa-solid fa-folder-open text-6xl text-gray-600"></i>
+                <h2 class="text-3xl font-bold mt-8">No resumes uploaded yet</h2>
+                <p class="text-gray-400 mt-4">Upload your first resume to see the AI analysis here.</p>
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</section>
+
+{% endblock %}

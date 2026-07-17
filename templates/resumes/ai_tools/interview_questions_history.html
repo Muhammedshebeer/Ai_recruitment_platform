@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Interview Prep History{% endblock %}
+
+{% block content %}
+
+<section class="max-w-7xl mx-auto px-6 py-16">
+
+    <div class="mb-12">
+        <span class="px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-300">
+            Interview Prep
+        </span>
+
+        <h1 class="text-5xl font-black mt-8">Generated Interview Questions</h1>
+
+        <p class="text-gray-400 mt-4">All AI-generated interview preparation sets saved under your account.</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-8">
+
+        {% for item in question_sets %}
+            <a href="{% url 'interview_questions_detail' item.id %}" class="glass rounded-3xl p-8 block hover:border-purple-400 transition">
+                <h3 class="text-2xl font-bold">{{ item.job.title }}</h3>
+                <p class="text-gray-400 mt-3">{{ item.job.company_name }}</p>
+                <p class="text-gray-500 mt-5">{{ item.created_at|date:"d M Y" }}</p>
+            </a>
+        {% empty %}
+            <div class="glass rounded-3xl p-12 md:col-span-3 text-center">
+                <i class="fa-solid fa-comments text-6xl text-gray-600"></i>
+                <h2 class="text-3xl font-bold mt-8">No interview questions yet</h2>
+            </div>
+        {% endfor %}
+
+    </div>
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+
+<section class="max-w-5xl mx-auto px-6 py-16">
+
+    <div class="mb-10">
+        <span class="px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400">
+            Recruiter Job Form
+        </span>
+
+        <h1 class="text-5xl font-black mt-8">{{ page_title }}</h1>
+
+        <p class="text-gray-400 mt-4">Add a clear job post so the matching engine can suggest it to relevant candidates.</p>
+    </div>
+
+    <div class="glass rounded-3xl p-10">
+
+        <form method="POST" class="space-y-6">
+            {% csrf_token %}
+
+            <div>
+                <label class="block mb-3 text-sm text-gray-400">Job Title</label>
+                {{ form.title }}
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block mb-3 text-sm text-gray-400">Company Name</label>
+                    {{ form.company_name }}
+                </div>
+
+                <div>
+                    <label class="block mb-3 text-sm text-gray-400">Location</label>
+                    {{ form.location }}
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <div>
+                    <label class="block mb-3 text-sm text-gray-400">Job Type</label>
+                    {{ form.job_type }}
+                </div>
+
+                <div>
+                    <label class="block mb-3 text-sm text-gray-400">Status</label>
+                    {{ form.status }}
+                </div>
+
+                <div>
+                    <label class="block mb-3 text-sm text-gray-400">Deadline</label>
+                    {{ form.deadline }}
+                </div>
+            </div>
+
+            <div>
+                <label class="block mb-3 text-sm text-gray-400">Description</label>
+                {{ form.description }}
+            </div>
+
+            <div>
+                <label class="block mb-3 text-sm text-gray-400">Requirements</label>
+                {{ form.requirements }}
+            </div>
+
+            <div>
+                <label class="block mb-3 text-sm text-gray-400">Responsibilities</label>
+                {{ form.responsibilities }}
+            </div>
+
+            <div>
+                <label class="block mb-3 text-sm text-gray-400">Required Skills</label>
+                {{ form.skills_required_text }}
+                <p class="text-gray-500 text-sm mt-2">Use commas or new lines. Example: Python, Django, PostgreSQL.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block mb-3 text-sm text-gray-400">Salary Min</label>
+                    {{ form.salary_min }}
+                </div>
+
+                <div>
+                    <label class="block mb-3 text-sm text-gray-400">Salary Max</label>
+                    {{ form.salary_max }}
+                </div>
+            </div>
+
+            {% if form.errors %}
+                <div class="rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 px-5 py-4 text-sm">
+                    Please correct the job post details.
+                </div>
+            {% endif %}
+
+            <button type="submit"
+                    class="w-full py-4 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 font-bold text-lg hover:scale-[1.02] transition">
+                {{ button_text }}
+            </button>
+
+        </form>
+
+    </div>
+
+</section>
+
+{% endblock %}
