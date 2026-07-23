@@ -1687,3 +1687,117 @@ def ai_agent_confirm_action(request, action_id):
         },
         status=400,
     )
+    
+
+@login_required
+def ai_agent_widget_bootstrap(request):
+    session = AgentSession.objects.filter(
+        user=request.user
+    ).order_by("-updated_at").first()
+
+    if not session:
+        session = AgentSession.objects.create(
+            user=request.user,
+            title="Floating AI Agent",
+        )
+
+    messages = session.messages.order_by("-created_at")[:10]
+    messages = reversed(list(messages))
+
+    messages_data = []
+
+    for message in messages:
+        messages_data.append(
+            {
+                "role": message.role,
+                "content": message.content,
+                "tool_name": message.tool_name,
+            }
+        )
+
+    return JsonResponse(
+        {
+            "success": True,
+            "session_id": session.id,
+            "messages": messages_data,
+        }
+    )
+
+
+@login_required
+@require_POST
+def ai_agent_widget_send(request):
+    session_id = request.POST.get("session_id")
+    user_message = request.POST.get("message", "").strip()
+
+    if not user_message:
+        return JsonResponse(
+            {
+                "success": False,
+                "error": "Message is required.",
+            },
+            status=400,
+        )
+
+    session = None
+
+    if session_id:
+        session = AgentSession.objects.filter(
+            id=session_id,
+            user=request.user,
+        ).first()
+
+    if not session:
+        session = AgentSession.objects.create(
+            user=request.user,
+            title="Floating AI Agent",
+        )
+
+    AgentMessage.objects.create(
+        session=session,
+        role=AgentMessage.ROLE_USER,
+        content=user_message,
+    )
+
+    if session.title in ["New Agent Chat", "Floating AI Agent"]:
+        session.title = user_message[:60]
+        session.save(update_fields=["title", "updated_at"])
+
+    try:
+        result = RecruitmentAgentService.run_agent(
+            user=request.user,
+            session=session,
+            user_message=user_message,
+        )
+
+        answer = result["answer"]
+        tool_name = result["tool_name"]
+        tool_result = result["tool_result"]
+
+    except Exception as exc:
+        answer = "AI agent failed: %s" % exc
+        tool_name = ""
+        tool_result = {
+            "success": False,
+            "error": str(exc),
+        }
+
+    AgentMessage.objects.create(
+        session=session,
+        role=AgentMessage.ROLE_AGENT,
+        content=answer,
+        tool_name=tool_name,
+        tool_result=tool_result,
+    )
+
+    session.save(update_fields=["updated_at"])
+
+    return JsonResponse(
+        {
+            "success": True,
+            "session_id": session.id,
+            "reply": answer,
+            "tool_name": tool_name,
+        }
+    )    
+    

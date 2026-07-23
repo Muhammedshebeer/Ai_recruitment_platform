@@ -51,6 +51,8 @@ ai_agent_new_session,
 ai_agent_page,
 ai_agent_send_message,
 ai_agent_session,
+ai_agent_widget_bootstrap,
+ai_agent_widget_send,
 )
 
 urlpatterns = [
@@ -120,4 +122,16 @@ path("ai-agent/new/", ai_agent_new_session, name="ai_agent_new_session"),
 path("ai-agent/<int:session_id>/", ai_agent_session, name="ai_agent_session"),
 path("ai-agent/<int:session_id>/send/", ai_agent_send_message, name="ai_agent_send_message"),
 path("ai-agent/action/<int:action_id>/confirm/", ai_agent_confirm_action, name="ai_agent_confirm_action"),
+
+path(
+    "ai-agent/widget/bootstrap/",
+    ai_agent_widget_bootstrap,
+    name="ai_agent_widget_bootstrap",
+),
+
+path(
+    "ai-agent/widget/send/",
+    ai_agent_widget_send,
+    name="ai_agent_widget_send",
+),
 ]
