@@ -4,6 +4,9 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.forms import AuthenticationForm
 from django.db.models import Avg, Count, Max, Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST
+
+from django.http import JsonResponse
 
 from .forms import (
     CandidateProfileForm,
@@ -25,11 +28,16 @@ from .models import (
     ReportedJob,
     Resume,
     SavedJob,
+    ChatSession,
+    ChatMessage,
+    AgentActionLog, AgentMessage, AgentSession, JobApplication
 )
 from .services.career_tool_service import CareerToolsService
 from .services.email_service import EmailService
 from .services.job_matching_services import JobMatchingService
 from .services.resume_analysis_service import ResumeAnalysisService
+from .services.chatbot_service import ChatbotService
+from .services.agent_service import RecruitmentAgentService
 
 
 def get_or_create_profile(user, default_role=Profile.ROLE_JOB_SEEKER):
@@ -330,7 +338,7 @@ def candidate_profile_settings(request):
 
     return render(
         request,
-        "resumes/candidate/profile_settings.html",
+        "resumes/candidates/profile_settings.html",
         {
             "form": form,
         },
@@ -1365,3 +1373,317 @@ def platform_admin_update_report_status(request, report_id):
             messages.success(request, "Report updated successfully.")
 
     return redirect("platform_admin_reported_jobs")
+
+
+
+# for ai chatbot integration #
+
+@login_required
+def chatbot_page(request):
+    sessions = ChatSession.objects.filter(
+        user=request.user
+    ).order_by("-updated_at")
+
+    active_session = sessions.first()
+
+    if not active_session:
+        active_session = ChatSession.objects.create(
+            user=request.user,
+            title="New Chat",
+        )
+
+    messages_list = active_session.messages.all()
+
+    return render(
+        request,
+        "resumes/chatbot.html",
+        {
+            "sessions": sessions,
+            "active_session": active_session,
+            "messages_list": messages_list,
+        },
+    )
+
+
+@login_required
+def chatbot_new_session(request):
+    session = ChatSession.objects.create(
+        user=request.user,
+        title="New Chat",
+    )
+
+    return redirect("chatbot_session", session_id=session.id)
+
+
+@login_required
+def chatbot_session(request, session_id):
+    sessions = ChatSession.objects.filter(
+        user=request.user
+    ).order_by("-updated_at")
+
+    active_session = get_object_or_404(
+        ChatSession,
+        id=session_id,
+        user=request.user,
+    )
+
+    messages_list = active_session.messages.all()
+
+    return render(
+        request,
+        "resumes/chatbot.html",
+        {
+            "sessions": sessions,
+            "active_session": active_session,
+            "messages_list": messages_list,
+        },
+    )
+
+
+@login_required
+@require_POST
+def chatbot_send_message(request, session_id):
+    session = get_object_or_404(
+        ChatSession,
+        id=session_id,
+        user=request.user,
+    )
+
+    user_message = request.POST.get("message", "").strip()
+
+    if not user_message:
+        return JsonResponse(
+            {
+                "success": False,
+                "error": "Message is required.",
+            },
+            status=400,
+        )
+
+    ChatMessage.objects.create(
+        session=session,
+        role=ChatMessage.ROLE_USER,
+        content=user_message,
+    )
+
+    if session.title == "New Chat":
+        session.title = user_message[:60]
+        session.save(update_fields=["title", "updated_at"])
+
+    try:
+        assistant_reply = ChatbotService.ask(
+            user=request.user,
+            session=session,
+            user_message=user_message,
+        )
+
+    except Exception as exc:
+        assistant_reply = "Sorry, AI chatbot failed to respond. Error: %s" % exc
+
+    ChatMessage.objects.create(
+        session=session,
+        role=ChatMessage.ROLE_ASSISTANT,
+        content=assistant_reply,
+    )
+
+    session.save(update_fields=["updated_at"])
+
+    return JsonResponse(
+        {
+            "success": True,
+            "reply": assistant_reply,
+        }
+    )
+
+
+# for ai agent integration #
+
+@login_required
+def ai_agent_page(request):
+    sessions = AgentSession.objects.filter(
+        user=request.user
+    ).order_by("-updated_at")
+
+    active_session = sessions.first()
+
+    if not active_session:
+        active_session = AgentSession.objects.create(
+            user=request.user,
+            title="New Agent Chat",
+        )
+
+    messages_list = active_session.messages.all()
+
+    return render(
+        request,
+        "resumes/agent.html",
+        {
+            "sessions": sessions,
+            "active_session": active_session,
+            "messages_list": messages_list,
+        },
+    )
+
+
+@login_required
+def ai_agent_new_session(request):
+    session = AgentSession.objects.create(
+        user=request.user,
+        title="New Agent Chat",
+    )
+
+    return redirect("ai_agent_session", session_id=session.id)
+
+
+@login_required
+def ai_agent_session(request, session_id):
+    sessions = AgentSession.objects.filter(
+        user=request.user
+    ).order_by("-updated_at")
+
+    active_session = get_object_or_404(
+        AgentSession,
+        id=session_id,
+        user=request.user,
+    )
+
+    messages_list = active_session.messages.all()
+
+    return render(
+        request,
+        "resumes/agent.html",
+        {
+            "sessions": sessions,
+            "active_session": active_session,
+            "messages_list": messages_list,
+        },
+    )
+
+
+@login_required
+@require_POST
+def ai_agent_send_message(request, session_id):
+    session = get_object_or_404(
+        AgentSession,
+        id=session_id,
+        user=request.user,
+    )
+
+    user_message = request.POST.get("message", "").strip()
+
+    if not user_message:
+        return JsonResponse(
+            {
+                "success": False,
+                "error": "Message is required.",
+            },
+            status=400,
+        )
+
+    AgentMessage.objects.create(
+        session=session,
+        role=AgentMessage.ROLE_USER,
+        content=user_message,
+    )
+
+    if session.title == "New Agent Chat":
+        session.title = user_message[:60]
+        session.save(update_fields=["title", "updated_at"])
+
+    try:
+        result = RecruitmentAgentService.run_agent(
+            user=request.user,
+            session=session,
+            user_message=user_message,
+        )
+
+        answer = result["answer"]
+        tool_name = result["tool_name"]
+        tool_result = result["tool_result"]
+
+    except Exception as exc:
+        answer = "AI agent failed: %s" % exc
+        tool_name = ""
+        tool_result = {
+            "success": False,
+            "error": str(exc),
+        }
+
+    AgentMessage.objects.create(
+        session=session,
+        role=AgentMessage.ROLE_AGENT,
+        content=answer,
+        tool_name=tool_name,
+        tool_result=tool_result,
+    )
+
+    session.save(update_fields=["updated_at"])
+
+    return JsonResponse(
+        {
+            "success": True,
+            "reply": answer,
+            "tool_name": tool_name,
+            "tool_result": tool_result,
+        }
+    )
+
+
+@login_required
+@require_POST
+def ai_agent_confirm_action(request, action_id):
+    action = get_object_or_404(
+        AgentActionLog,
+        id=action_id,
+        user=request.user,
+        status=AgentActionLog.STATUS_PROPOSED,
+    )
+
+    if action.action_name == "shortlist_candidate":
+        application_id = action.input_data.get("application_id")
+
+        try:
+            application = JobApplication.objects.get(
+                id=application_id,
+                job__recruiter=request.user,
+            )
+
+            application.status = JobApplication.STATUS_SHORTLISTED
+            application.save(update_fields=["status", "updated_at"])
+
+            action.status = AgentActionLog.STATUS_COMPLETED
+            action.result_data = {
+                "message": "Candidate shortlisted successfully.",
+                "application_id": application.id,
+            }
+            action.save(update_fields=["status", "result_data", "updated_at"])
+
+            return JsonResponse(
+                {
+                    "success": True,
+                    "message": "Candidate shortlisted successfully.",
+                }
+            )
+
+        except Exception as exc:
+            action.status = AgentActionLog.STATUS_FAILED
+            action.result_data = {
+                "error": str(exc),
+            }
+            action.save(update_fields=["status", "result_data", "updated_at"])
+
+            return JsonResponse(
+                {
+                    "success": False,
+                    "error": str(exc),
+                },
+                status=400,
+            )
+
+    return JsonResponse(
+        {
+            "success": False,
+            "error": "Unsupported action.",
+        },
+        status=400,
+    )

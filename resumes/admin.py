@@ -9,6 +9,9 @@ from .models import (
     Resume,
     SavedJob,
     ReportedJob,
+    AgentActionLog,
+AgentMessage,
+AgentSession,
 )
 
 
@@ -67,3 +70,24 @@ class InterviewQuestionSetAdmin(admin.ModelAdmin):
     list_display = ("id", "title", "user", "job", "resume", "created_at")
     search_fields = ("title", "user__username", "job__title")
     list_filter = ("created_at",)
+    
+    
+@admin.register(AgentSession)
+class AgentSessionAdmin(admin.ModelAdmin):
+    list_display = ("id", "user", "title", "created_at", "updated_at")
+    search_fields = ("user__username", "title")
+    list_filter = ("created_at",)
+
+
+@admin.register(AgentMessage)
+class AgentMessageAdmin(admin.ModelAdmin):
+    list_display = ("id", "session", "role", "tool_name", "created_at")
+    search_fields = ("content", "tool_name", "session__user__username")
+    list_filter = ("role", "created_at")
+
+
+@admin.register(AgentActionLog)
+class AgentActionLogAdmin(admin.ModelAdmin):
+    list_display = ("id", "user", "action_name", "status", "created_at")
+    search_fields = ("user__username", "action_name", "notes")
+    list_filter = ("status", "action_name", "created_at")    

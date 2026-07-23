@@ -1,0 +1,275 @@
+{% extends "base.html" %}
+
+{% block title %}
+Recruitment AI Agent
+{% endblock %}
+
+{% block content %}
+
+<section class="max-w-7xl mx-auto px-6 py-10">
+
+    <div class="grid lg:grid-cols-4 gap-8">
+
+        <aside class="glass rounded-3xl p-6 h-fit">
+
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-bold">Agent Chats</h2>
+
+                <a href="{% url 'ai_agent_new_session' %}"
+                   class="w-10 h-10 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center">
+                    <i class="fa-solid fa-plus"></i>
+                </a>
+            </div>
+
+            <div class="space-y-3">
+
+                {% for session in sessions %}
+
+                    <a href="{% url 'ai_agent_session' session.id %}"
+                       class="block rounded-2xl px-4 py-3 text-sm transition
+                              {% if active_session.id == session.id %}
+                                  bg-blue-500/20 border border-blue-500/40 text-blue-300
+                              {% else %}
+                                  bg-white/5 hover:bg-white/10 text-gray-300
+                              {% endif %}">
+                        {{ session.title }}
+                    </a>
+
+                {% empty %}
+
+                    <p class="text-gray-400 text-sm">
+                        No agent chats yet.
+                    </p>
+
+                {% endfor %}
+
+            </div>
+
+        </aside>
+
+        <div class="lg:col-span-3 glass rounded-3xl overflow-hidden">
+
+            <div class="border-b border-slate-700 p-6 flex items-center justify-between">
+
+                <div>
+                    <h1 class="text-2xl font-bold">
+                        Recruitment AI Agent
+                    </h1>
+
+                    <p class="text-gray-400 text-sm mt-1">
+                        This agent can use your recruitment data and tools to answer useful questions.
+                    </p>
+                </div>
+
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center">
+                    <i class="fa-solid fa-wand-magic-sparkles text-xl"></i>
+                </div>
+
+            </div>
+
+            <div id="agentMessages" class="h-[620px] overflow-y-auto p-6 space-y-5">
+
+                {% for message in messages_list %}
+
+                    {% if message.role == "user" %}
+
+                        <div class="flex justify-end">
+                            <div class="max-w-[75%] rounded-3xl rounded-tr-none bg-gradient-to-r from-blue-500 to-cyan-500 px-5 py-4">
+                                {{ message.content|linebreaksbr }}
+                            </div>
+                        </div>
+
+                    {% else %}
+
+                        <div class="flex justify-start">
+                            <div class="max-w-[75%] rounded-3xl rounded-tl-none bg-white/5 border border-slate-700 px-5 py-4 text-gray-300">
+                                {{ message.content|linebreaksbr }}
+
+                                {% if message.tool_name %}
+                                    <div class="mt-4 pt-4 border-t border-slate-700 text-xs text-gray-500">
+                                        Tool used: {{ message.tool_name }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                    {% endif %}
+
+                {% empty %}
+
+                    <div class="text-center py-24">
+                        <i class="fa-solid fa-wand-magic-sparkles text-6xl text-gray-600"></i>
+
+                        <h2 class="text-3xl font-bold mt-8">
+                            Start using your AI Agent
+                        </h2>
+
+                        <p class="text-gray-400 mt-4">
+                            Try: “Which jobs match my resume?” or “Rank candidates for job ID 1.”
+                        </p>
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+            <form id="agentForm" class="border-t border-slate-700 p-5">
+
+                {% csrf_token %}
+
+                <div class="flex gap-4">
+
+                    <input type="text"
+                           id="agentInput"
+                           placeholder="Ask your recruitment agent..."
+                           autocomplete="off"
+                           class="flex-1 rounded-2xl bg-slate-900 border border-slate-700 px-5 py-4 outline-none focus:border-blue-500">
+
+                    <button type="submit"
+                            id="agentSendButton"
+                            class="px-7 py-4 rounded-2xl bg-gradient-to-r from-blue-500 to-cyan-500 font-bold">
+                        Send
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script>
+    const agentForm = document.getElementById("agentForm");
+    const agentInput = document.getElementById("agentInput");
+    const agentMessages = document.getElementById("agentMessages");
+    const agentSendButton = document.getElementById("agentSendButton");
+
+    function scrollAgentBottom() {
+        agentMessages.scrollTop = agentMessages.scrollHeight;
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement("div");
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    function addAgentMessage(role, content, toolName = "") {
+        const wrapper = document.createElement("div");
+
+        if (role === "user") {
+            wrapper.className = "flex justify-end";
+
+            wrapper.innerHTML = `
+                <div class="max-w-[75%] rounded-3xl rounded-tr-none bg-gradient-to-r from-blue-500 to-cyan-500 px-5 py-4">
+                    ${escapeHtml(content).replace(/\n/g, "<br>")}
+                </div>
+            `;
+        } else {
+            wrapper.className = "flex justify-start";
+
+            let toolHtml = "";
+
+            if (toolName) {
+                toolHtml = `
+                    <div class="mt-4 pt-4 border-t border-slate-700 text-xs text-gray-500">
+                        Tool used: ${escapeHtml(toolName)}
+                    </div>
+                `;
+            }
+
+            wrapper.innerHTML = `
+                <div class="max-w-[75%] rounded-3xl rounded-tl-none bg-white/5 border border-slate-700 px-5 py-4 text-gray-300">
+                    ${escapeHtml(content).replace(/\n/g, "<br>")}
+                    ${toolHtml}
+                </div>
+            `;
+        }
+
+        agentMessages.appendChild(wrapper);
+        scrollAgentBottom();
+    }
+
+    function addAgentThinking() {
+        const wrapper = document.createElement("div");
+        wrapper.id = "agentThinking";
+        wrapper.className = "flex justify-start";
+
+        wrapper.innerHTML = `
+            <div class="rounded-3xl rounded-tl-none bg-white/5 border border-slate-700 px-5 py-4 text-gray-400">
+                <i class="fa-solid fa-spinner animate-spin mr-2"></i>
+                Agent is thinking and checking tools...
+            </div>
+        `;
+
+        agentMessages.appendChild(wrapper);
+        scrollAgentBottom();
+    }
+
+    function removeAgentThinking() {
+        const thinking = document.getElementById("agentThinking");
+
+        if (thinking) {
+            thinking.remove();
+        }
+    }
+
+    agentForm.addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        const message = agentInput.value.trim();
+
+        if (!message) {
+            return;
+        }
+
+        addAgentMessage("user", message);
+
+        agentInput.value = "";
+        agentSendButton.disabled = true;
+        agentSendButton.innerText = "Running...";
+
+        addAgentThinking();
+
+        const formData = new FormData();
+        formData.append("message", message);
+        formData.append(
+            "csrfmiddlewaretoken",
+            document.querySelector("[name=csrfmiddlewaretoken]").value
+        );
+
+        fetch("{% url 'ai_agent_send_message' active_session.id %}", {
+            method: "POST",
+            body: formData,
+        })
+        .then(response => response.json())
+        .then(data => {
+            removeAgentThinking();
+
+            if (data.success) {
+                addAgentMessage("agent", data.reply, data.tool_name);
+            } else {
+                addAgentMessage("agent", data.error || "Something went wrong.");
+            }
+        })
+        .catch(error => {
+            removeAgentThinking();
+            addAgentMessage("agent", "Agent request failed. Please try again.");
+        })
+        .finally(() => {
+            agentSendButton.disabled = false;
+            agentSendButton.innerText = "Send";
+        });
+    });
+
+    scrollAgentBottom();
+</script>
+
+{% endblock %}

@@ -580,3 +580,173 @@ class ReportedJob(models.Model):
 
     def __str__(self):
         return "%s - %s" % (self.job.title, self.get_reason_display())
+
+
+
+# for ai chatbot #
+
+class ChatSession(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="chat_sessions",
+    )
+
+    title = models.CharField(
+        max_length=255,
+        default="New Chat",
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-updated_at"]
+
+    def __str__(self):
+        return "%s - %s" % (self.user.username, self.title)
+
+
+class ChatMessage(models.Model):
+    ROLE_USER = "user"
+    ROLE_ASSISTANT = "assistant"
+
+    ROLE_CHOICES = (
+        (ROLE_USER, "User"),
+        (ROLE_ASSISTANT, "Assistant"),
+    )
+
+    session = models.ForeignKey(
+        ChatSession,
+        on_delete=models.CASCADE,
+        related_name="messages",
+    )
+
+    role = models.CharField(
+        max_length=20,
+        choices=ROLE_CHOICES,
+    )
+
+    content = models.TextField()
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["created_at"]
+
+    def __str__(self):
+        return "%s - %s" % (self.role, self.content[:50])
+
+
+
+# for ai agent #
+
+class AgentSession(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="agent_sessions",
+    )
+
+    title = models.CharField(
+        max_length=255,
+        default="New Agent Chat",
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-updated_at"]
+
+    def __str__(self):
+        return "%s - %s" % (self.user.username, self.title)
+
+
+class AgentMessage(models.Model):
+    ROLE_USER = "user"
+    ROLE_AGENT = "agent"
+    ROLE_TOOL = "tool"
+
+    ROLE_CHOICES = (
+        (ROLE_USER, "User"),
+        (ROLE_AGENT, "Agent"),
+        (ROLE_TOOL, "Tool"),
+    )
+
+    session = models.ForeignKey(
+        AgentSession,
+        on_delete=models.CASCADE,
+        related_name="messages",
+    )
+
+    role = models.CharField(
+        max_length=20,
+        choices=ROLE_CHOICES,
+    )
+
+    content = models.TextField()
+
+    tool_name = models.CharField(
+        max_length=100,
+        blank=True,
+    )
+
+    tool_result = models.JSONField(
+        null=True,
+        blank=True,
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["created_at"]
+
+    def __str__(self):
+        return "%s - %s" % (self.role, self.content[:50])
+
+
+class AgentActionLog(models.Model):
+    STATUS_PROPOSED = "proposed"
+    STATUS_CONFIRMED = "confirmed"
+    STATUS_REJECTED = "rejected"
+    STATUS_COMPLETED = "completed"
+    STATUS_FAILED = "failed"
+
+    STATUS_CHOICES = (
+        (STATUS_PROPOSED, "Proposed"),
+        (STATUS_CONFIRMED, "Confirmed"),
+        (STATUS_REJECTED, "Rejected"),
+        (STATUS_COMPLETED, "Completed"),
+        (STATUS_FAILED, "Failed"),
+    )
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="agent_action_logs",
+    )
+
+    action_name = models.CharField(max_length=100)
+
+    status = models.CharField(
+        max_length=30,
+        choices=STATUS_CHOICES,
+        default=STATUS_PROPOSED,
+    )
+
+    input_data = models.JSONField(default=dict, blank=True)
+
+    result_data = models.JSONField(default=dict, blank=True)
+
+    notes = models.TextField(blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return "%s - %s" % (self.action_name, self.status)
+

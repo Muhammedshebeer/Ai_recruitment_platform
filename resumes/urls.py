@@ -42,6 +42,15 @@ from .views import (
     recruiter_company_profile,
     recruiter_pending_status,
     report_job,
+    chatbot_new_session,
+    chatbot_page,
+    chatbot_send_message,
+    chatbot_session,
+    ai_agent_confirm_action,
+ai_agent_new_session,
+ai_agent_page,
+ai_agent_send_message,
+ai_agent_session,
 )
 
 urlpatterns = [
@@ -100,4 +109,15 @@ urlpatterns = [
     path("platform-admin/recruiters/<int:profile_id>/update-status/", platform_admin_update_recruiter_status, name="platform_admin_update_recruiter_status"),
     path("platform-admin/reported-jobs/", platform_admin_reported_jobs, name="platform_admin_reported_jobs"),
     path("platform-admin/reported-jobs/<int:report_id>/update-status/", platform_admin_update_report_status, name="platform_admin_update_report_status"),
+    
+    path("chatbot/", chatbot_page, name="chatbot_page"),
+    path("chatbot/new/", chatbot_new_session, name="chatbot_new_session"),
+    path("chatbot/<int:session_id>/", chatbot_session, name="chatbot_session"),
+    path("chatbot/<int:session_id>/send/", chatbot_send_message, name="chatbot_send_message"),
+    
+    path("ai-agent/", ai_agent_page, name="ai_agent_page"),
+path("ai-agent/new/", ai_agent_new_session, name="ai_agent_new_session"),
+path("ai-agent/<int:session_id>/", ai_agent_session, name="ai_agent_session"),
+path("ai-agent/<int:session_id>/send/", ai_agent_send_message, name="ai_agent_send_message"),
+path("ai-agent/action/<int:action_id>/confirm/", ai_agent_confirm_action, name="ai_agent_confirm_action"),
 ]
