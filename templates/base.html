@@ -575,37 +575,60 @@
          class="hidden w-[380px] max-w-[calc(100vw-3rem)] h-[560px] mb-5 glass rounded-3xl shadow-2xl overflow-hidden border border-cyan-500/20">
 
         <!-- Header -->
-        <div class="p-5 border-b border-slate-700 bg-slate-950/70 flex items-center justify-between">
+        <div class="p-5 border-b border-slate-700 bg-slate-950/70">
 
-            <div class="flex items-center gap-3">
+            <div class="flex items-center justify-between">
 
-                <div class="w-12 h-12 rounded-2xl bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-cyan-500/20">
-                    <i class="fa-solid fa-wand-magic-sparkles text-xl text-white"></i>
+                <div class="flex items-center gap-3">
+
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                        <i class="fa-solid fa-wand-magic-sparkles text-xl text-white"></i>
+                    </div>
+
+                    <div>
+                        <h3 class="font-bold text-lg">
+                            AI Agent
+                        </h3>
+
+                        <p class="text-xs text-gray-400">
+                            Recruitment assistant
+                        </p>
+                    </div>
+
                 </div>
 
-                <div>
-                    <h3 class="font-bold text-lg">
-                        AI Agent
-                    </h3>
-
-                    <p class="text-xs text-gray-400">
-                        Recruitment assistant
-                    </p>
-                </div>
+                <button type="button"
+                        id="aiAgentClose"
+                        class="w-9 h-9 rounded-xl bg-white/5 hover:bg-red-500/20 text-gray-400 hover:text-red-300 transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
 
             </div>
 
-            <button type="button"
-                    id="aiAgentClose"
-                    class="w-9 h-9 rounded-xl bg-white/5 hover:bg-red-500/20 text-gray-400 hover:text-red-300 transition">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
+            <!-- New Chat + Clear All -->
+            <div class="grid grid-cols-2 gap-3 mt-5">
+
+                <!-- <button type="button"
+                        id="aiAgentNewChat"
+                        class="px-4 py-3 rounded-xl bg-blue-500/10 border border-blue-500/30 text-blue-300 text-sm font-semibold hover:bg-blue-500/20 transition">
+                    <i class="fa-solid fa-plus mr-2"></i>
+                    New Chat
+                </button> -->
+
+                <button type="button"
+                        id="aiAgentClearChats"
+                        class="px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-sm font-semibold hover:bg-red-500/20 transition">
+                    <i class="fa-solid fa-trash mr-2"></i>
+                    Clear All
+                </button>
+
+            </div>
 
         </div>
 
         <!-- Messages -->
         <div id="aiAgentMessages"
-             class="h-[405px] overflow-y-auto p-5 space-y-4 bg-slate-950/40">
+             class="h-[340px] overflow-y-auto p-5 space-y-4 bg-slate-950/40">
 
             <div class="flex justify-start">
                 <div class="max-w-[85%] rounded-2xl rounded-tl-none bg-white/5 border border-slate-700 px-4 py-3 text-sm text-gray-300">
@@ -650,7 +673,6 @@
 
         <span class="relative w-16 h-16 rounded-full bg-slate-950/20 flex items-center justify-center">
 
-            <!-- Simple robot/vector icon -->
             <svg width="38" height="38" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect x="14" y="18" width="36" height="32" rx="10" fill="white"/>
                 <circle cx="25" cy="34" r="4" fill="#0F172A"/>
@@ -668,11 +690,6 @@
 
 </div>
 
-{% endif %}
-
-
-{% if request.user.is_authenticated %}
-
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     const toggleButton = document.getElementById("aiAgentToggle");
@@ -683,17 +700,58 @@ document.addEventListener("DOMContentLoaded", function () {
     const sendButton = document.getElementById("aiAgentSend");
     const messagesBox = document.getElementById("aiAgentMessages");
     const sessionInput = document.getElementById("aiAgentSessionId");
+    const newChatButton = document.getElementById("aiAgentNewChat");
+    const clearChatsButton = document.getElementById("aiAgentClearChats");
 
     let loaded = false;
 
+    if (
+        !toggleButton ||
+        !closeButton ||
+        !panel ||
+        !form ||
+        !input ||
+        !sendButton ||
+        !messagesBox ||
+        !sessionInput ||
+        !newChatButton ||
+        !clearChatsButton
+    ) {
+        console.error("AI Agent widget element missing. Check base.html IDs.");
+        return;
+    }
+
     function escapeHtml(text) {
         const div = document.createElement("div");
-        div.textContent = text;
+        div.textContent = text || "";
         return div.innerHTML;
     }
 
     function scrollBottom() {
         messagesBox.scrollTop = messagesBox.scrollHeight;
+    }
+
+    function getCsrfToken() {
+        const csrfInput = form.querySelector("[name=csrfmiddlewaretoken]");
+
+        if (!csrfInput) {
+            console.error("CSRF token missing in AI Agent form.");
+            return "";
+        }
+
+        return csrfInput.value;
+    }
+
+    function setDefaultWelcomeMessage() {
+        messagesBox.innerHTML = `
+            <div class="flex justify-start">
+                <div class="max-w-[85%] rounded-2xl rounded-tl-none bg-white/5 border border-slate-700 px-4 py-3 text-sm text-gray-300">
+                    Hi {{ request.user.username }}, I can help with resumes, jobs, candidates, applications, and recruitment decisions.
+                </div>
+            </div>
+        `;
+
+        scrollBottom();
     }
 
     function addMessage(role, content, toolName = "") {
@@ -733,6 +791,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function addThinking() {
+        removeThinking();
+
         const wrapper = document.createElement("div");
         wrapper.id = "aiAgentThinking";
         wrapper.className = "flex justify-start";
@@ -762,12 +822,14 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         fetch("{% url 'ai_agent_widget_bootstrap' %}")
-            .then(response => response.json())
-            .then(data => {
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (data) {
                 if (data.success) {
                     sessionInput.value = data.session_id;
 
-                    if (data.messages.length > 0) {
+                    if (data.messages && data.messages.length > 0) {
                         messagesBox.innerHTML = "";
 
                         data.messages.forEach(function (message) {
@@ -781,13 +843,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     loaded = true;
                     scrollBottom();
+                } else {
+                    addMessage("agent", "Unable to load AI agent session.");
                 }
             })
-            .catch(() => {
-                addMessage(
-                    "agent",
-                    "Unable to load AI agent session."
-                );
+            .catch(function (error) {
+                console.error("AI Agent bootstrap failed:", error);
+                addMessage("agent", "Unable to load AI agent session.");
             });
     }
 
@@ -806,6 +868,66 @@ document.addEventListener("DOMContentLoaded", function () {
 
     closeButton.addEventListener("click", function () {
         panel.classList.add("hidden");
+    });
+
+    newChatButton.addEventListener("click", function () {
+        const formData = new FormData();
+        formData.append("csrfmiddlewaretoken", getCsrfToken());
+
+        fetch("{% url 'ai_agent_widget_new_session' %}", {
+            method: "POST",
+            body: formData,
+        })
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (data) {
+            if (data.success) {
+                sessionInput.value = data.session_id;
+                loaded = true;
+                setDefaultWelcomeMessage();
+                input.focus();
+            } else {
+                addMessage("agent", data.error || "Unable to start a new chat.");
+            }
+        })
+        .catch(function (error) {
+            console.error("New chat failed:", error);
+            addMessage("agent", "New chat request failed.");
+        });
+    });
+
+    clearChatsButton.addEventListener("click", function () {
+        const confirmed = confirm("Are you sure you want to clear all AI Agent chats?");
+
+        if (!confirmed) {
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("csrfmiddlewaretoken", getCsrfToken());
+
+        fetch("{% url 'ai_agent_widget_clear_all_chats' %}", {
+            method: "POST",
+            body: formData,
+        })
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (data) {
+            if (data.success) {
+                sessionInput.value = data.session_id;
+                loaded = true;
+                setDefaultWelcomeMessage();
+                input.focus();
+            } else {
+                addMessage("agent", data.error || "Unable to clear chats.");
+            }
+        })
+        .catch(function (error) {
+            console.error("Clear chats failed:", error);
+            addMessage("agent", "Clear chat request failed.");
+        });
     });
 
     form.addEventListener("submit", function (event) {
@@ -828,17 +950,16 @@ document.addEventListener("DOMContentLoaded", function () {
         const formData = new FormData();
         formData.append("session_id", sessionInput.value);
         formData.append("message", message);
-        formData.append(
-            "csrfmiddlewaretoken",
-            form.querySelector("[name=csrfmiddlewaretoken]").value
-        );
+        formData.append("csrfmiddlewaretoken", getCsrfToken());
 
         fetch("{% url 'ai_agent_widget_send' %}", {
             method: "POST",
             body: formData,
         })
-        .then(response => response.json())
-        .then(data => {
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (data) {
             removeThinking();
 
             if (data.success) {
@@ -848,11 +969,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 addMessage("agent", data.error || "Something went wrong.");
             }
         })
-        .catch(() => {
+        .catch(function (error) {
+            console.error("AI Agent send failed:", error);
             removeThinking();
             addMessage("agent", "AI agent request failed. Please try again.");
         })
-        .finally(() => {
+        .finally(function () {
             sendButton.disabled = false;
             sendButton.classList.remove("opacity-60");
         });
@@ -988,6 +1110,60 @@ document.addEventListener("DOMContentLoaded", function () {
             }, 5000);
         });
     });
+
+
+    newChatButton.addEventListener("click", function () {
+    const formData = new FormData();
+    formData.append("csrfmiddlewaretoken", getCsrfToken());
+
+    fetch("{% url 'ai_agent_widget_new_session' %}", {
+        method: "POST",
+        body: formData,
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            sessionInput.value = data.session_id;
+            setDefaultWelcomeMessage();
+            input.focus();
+        } else {
+            addMessage("agent", "Unable to start a new chat.");
+        }
+    })
+    .catch(() => {
+        addMessage("agent", "New chat request failed.");
+    });
+});
+
+
+clearChatsButton.addEventListener("click", function () {
+    const confirmed = confirm("Are you sure you want to clear all AI Agent chats?");
+
+    if (!confirmed) {
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("csrfmiddlewaretoken", getCsrfToken());
+
+    fetch("{% url 'ai_agent_widget_clear_all_chats' %}", {
+        method: "POST",
+        body: formData,
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            sessionInput.value = data.session_id;
+            setDefaultWelcomeMessage();
+            input.focus();
+        } else {
+            addMessage("agent", "Unable to clear chats.");
+        }
+    })
+    .catch(() => {
+        addMessage("agent", "Clear chat request failed.");
+    });
+});
 </script>
 
 {% block extra_js %}

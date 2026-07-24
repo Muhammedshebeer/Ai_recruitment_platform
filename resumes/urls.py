@@ -53,6 +53,9 @@ ai_agent_send_message,
 ai_agent_session,
 ai_agent_widget_bootstrap,
 ai_agent_widget_send,
+ai_agent_clear_all_chats,
+ai_agent_widget_new_session,
+ai_agent_widget_clear_all_chats,
 )
 
 urlpatterns = [
@@ -134,4 +137,24 @@ path(
     ai_agent_widget_send,
     name="ai_agent_widget_send",
 ),
+
+path(
+    "ai-agent/clear-all/",
+    ai_agent_clear_all_chats,
+    name="ai_agent_clear_all_chats",
+),
+
+path(
+    "ai-agent/widget/new/",
+    ai_agent_widget_new_session,
+    name="ai_agent_widget_new_session",
+),
+
+path(
+    "ai-agent/widget/clear-all/",
+    ai_agent_widget_clear_all_chats,
+    name="ai_agent_widget_clear_all_chats",
+),
+
+
 ]

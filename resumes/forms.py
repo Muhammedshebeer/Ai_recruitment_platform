@@ -3,6 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
 from .models import JobApplication, JobPost, Profile, Resume,ReportedJob
+from .services.job_matching_services import JobMatchingService
 
 
 COMMON_INPUT_CLASS = "w-full rounded-xl bg-slate-900 border border-slate-700 px-5 py-4 outline-none focus:border-blue-500"
@@ -269,7 +270,7 @@ class JobApplicationForm(forms.ModelForm):
             self.fields["resume"].queryset = resumes
 
             if job:
-                from .services.job_matching_service import JobMatchingService
+                
 
                 choices = []
                 for resume in resumes:

@@ -1801,3 +1801,53 @@ def ai_agent_widget_send(request):
         }
     )    
     
+
+@login_required
+@require_POST
+def ai_agent_clear_all_chats(request):
+    AgentSession.objects.filter(
+        user=request.user
+    ).delete()
+
+    messages.success(
+        request,
+        "All AI Agent chats cleared successfully."
+    )
+
+    return redirect("ai_agent_page")    
+    
+
+@login_required
+@require_POST
+def ai_agent_widget_new_session(request):
+    session = AgentSession.objects.create(
+        user=request.user,
+        title="Floating AI Agent",
+    )
+
+    return JsonResponse({
+        "success": True,
+        "session_id": session.id,
+        "message": "New chat started.",
+    })
+
+
+@login_required
+@require_POST
+def ai_agent_widget_clear_all_chats(request):
+    AgentSession.objects.filter(
+        user=request.user
+    ).delete()
+
+    session = AgentSession.objects.create(
+        user=request.user,
+        title="Floating AI Agent",
+    )
+
+    return JsonResponse({
+        "success": True,
+        "session_id": session.id,
+        "message": "All AI Agent chats cleared.",
+    })
+
+   
