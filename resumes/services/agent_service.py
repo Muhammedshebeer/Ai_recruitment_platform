@@ -137,6 +137,37 @@ Return JSON structure:
     "arguments": {},
     "reason": ""
 }
+8. rag_search_platform_knowledge
+Use this when the user asks any question that needs searching platform knowledge, resumes, jobs, applications, companies, candidate information, or previous records.
+
+Arguments:
+{
+    "query": "the user's search question",
+    "top_k": 8
+}
+
+Examples:
+User: "list the jobs I applied yesterday"
+Return:
+{
+    "tool": "rag_search_platform_knowledge",
+    "arguments": {
+        "query": "jobs I applied yesterday",
+        "top_k": 8
+    },
+    "reason": "User is asking for application records from platform knowledge."
+}
+
+User: "which jobs match my resume?"
+Return:
+{
+    "tool": "rag_search_platform_knowledge",
+    "arguments": {
+        "query": "jobs matching my resume skills and target job title",
+        "top_k": 8
+    },
+    "reason": "User is asking for platform knowledge using RAG."
+}
 """ % role
 
         recent_messages = session.messages.order_by("-created_at")[:6]
@@ -192,12 +223,15 @@ User role: %s
 Answer clearly and practically.
 
 Rules:
-- Use the tool result as your source.
-- Do not invent database records.
-- If tool result is empty, explain what is missing.
-- If confirmation_required is true, clearly ask the user to confirm.
+- Use only the provided tool result as your source.
+- If the tool result source is rag_vector_database, say the answer is based on indexed platform knowledge.
+- Do not invent records.
+- Do not reveal records the user is not allowed to access.
+- If no relevant RAG results are found, say no matching indexed knowledge was found.
+- If results contain job applications, list job title, company, status, match score, and applied date if available.
+- If results contain jobs, list job title, company, location, job type, and status if available.
 - For recruiters, be direct and decision-focused.
-- For job seekers, be practical and supportive.
+- For job seekers, be practical and clear.
 """ % role
 
         messages = [

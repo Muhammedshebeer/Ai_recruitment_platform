@@ -8,6 +8,7 @@ from ..models import (
     Resume,
 )
 from .job_matching_services import JobMatchingService
+from .rag_service import RAGService
 
 
 class RecruitmentAgentTools:
@@ -289,7 +290,20 @@ class RecruitmentAgentTools:
 
     @classmethod
     def run_tool(cls, tool_name, user, arguments=None):
-        tool = cls.TOOL_MAP.get(tool_name)
+        tool_map = {
+            "latest_resume_summary": cls.latest_resume_summary,
+            "suggest_jobs_for_user": cls.suggest_jobs_for_user,
+            "my_applications": cls.my_applications,
+            "recruiter_jobs": cls.recruiter_jobs,
+            "rank_candidates_for_job": cls.rank_candidates_for_job,
+            "platform_summary": cls.platform_summary,
+            "propose_shortlist_candidate": cls.propose_shortlist_candidate,
+
+            # RAG tool
+            "rag_search_platform_knowledge": cls.rag_search_platform_knowledge,
+        }
+
+        tool = tool_map.get(tool_name)
 
         if not tool:
             return {
@@ -297,4 +311,32 @@ class RecruitmentAgentTools:
                 "message": "Unknown tool: %s" % tool_name,
             }
 
-        return tool.__func__(cls, user, arguments)
+        return tool(user, arguments)
+    
+    
+    @classmethod
+    def rag_search_platform_knowledge(cls, user, arguments=None):
+        arguments = arguments or {}
+
+        query = arguments.get("query", "")
+        top_k = int(arguments.get("top_k", 8))
+
+        if not query:
+            return {
+                "success": False,
+                "message": "Query is required for RAG search.",
+            }
+
+        results = RAGService.search(
+            query=query,
+            user=user,
+            top_k=top_k,
+        )
+
+        return {
+            "success": True,
+            "source": "rag_vector_database",
+            "query": query,
+            "results_count": len(results),
+            "results": results,
+        }
