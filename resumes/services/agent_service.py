@@ -199,19 +199,19 @@ Return:
     messages=messages,
     json_mode=True,
 )
+        
+        arguments_json = data.get("arguments_json", "{}")
 
-arguments_json = data.get("arguments_json", "{}")
+        try:
+            arguments = json.loads(arguments_json)
+        except json.JSONDecodeError:
+            arguments = {}
 
-try:
-    arguments = json.loads(arguments_json)
-except json.JSONDecodeError:
-    arguments = {}
-
-return {
-    "tool": data.get("tool", "none"),
-    "arguments": arguments,
-    "reason": data.get("reason", ""),
-}
+        return {
+            "tool": data.get("tool", "none"),
+            "arguments": arguments,
+            "reason": data.get("reason", ""),
+        }
 
     @classmethod
     def final_answer(cls, user, user_message, tool_name, tool_result):
