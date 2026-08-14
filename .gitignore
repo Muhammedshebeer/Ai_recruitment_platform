@@ -3,17 +3,21 @@ __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
+*.pyc
 
 # Virtual Environment
 venv/
 env/
+.venv/
 
 # Django
 db.sqlite3
 *.sqlite3
+rag_vector_db/
 
 # Environment Variables
 .env
+.env.example
 
 # Media
 media/

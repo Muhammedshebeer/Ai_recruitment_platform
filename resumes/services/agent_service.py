@@ -200,11 +200,18 @@ Return:
     json_mode=True,
 )
 
-        return {
-            "tool": data.get("tool", "none"),
-            "arguments": data.get("arguments", {}),
-            "reason": data.get("reason", ""),
-        }
+arguments_json = data.get("arguments_json", "{}")
+
+try:
+    arguments = json.loads(arguments_json)
+except json.JSONDecodeError:
+    arguments = {}
+
+return {
+    "tool": data.get("tool", "none"),
+    "arguments": arguments,
+    "reason": data.get("reason", ""),
+}
 
     @classmethod
     def final_answer(cls, user, user_message, tool_name, tool_result):

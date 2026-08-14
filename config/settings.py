@@ -144,19 +144,32 @@ DATABASES = {
 
 
 # Development email settings. Emails will print in your terminal.
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-DEFAULT_FROM_EMAIL = "noreply@ai-recruitment.local"
-ADMIN_EMAIL = "devuser3777@gmail.com"
+EMAIL_BACKEND = os.getenv(
+    "EMAIL_BACKEND"
+)
 
-# EMAIL_USE_TLS = True
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_PORT = 587
-# EMAIL_HOST_USER = 'devuser3777@gmail.com'                        #sample
-# # EMAIL_HOST_PASSWORD = 'Shebidev@3777'
-# EMAIL_HOST_PASSWORD = 'skkc shfr jami xvco'
-# DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-# SERVER_EMAIL = EMAIL_HOST_USER
-# ADMIN_EMAIL = "devuser3777@gmail.com"
+EMAIL_HOST = os.getenv("EMAIL_HOST")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", 587))
+
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True") == "True"
+EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "False") == "True"
+
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+
+DEFAULT_FROM_EMAIL = os.getenv(
+    "DEFAULT_FROM_EMAIL",
+    EMAIL_HOST_USER,
+)
+
+ADMIN_EMAIL = os.getenv(
+    "ADMIN_EMAIL",
+    EMAIL_HOST_USER,
+)
+
+EMAIL_TIMEOUT = int(os.getenv("EMAIL_TIMEOUT", 30))
+
+
 
 # For media uploads such as company logo, confirm you already have:
 MEDIA_URL = "/media/"
