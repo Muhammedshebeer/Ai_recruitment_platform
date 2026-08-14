@@ -1,3 +1,5 @@
+import profile
+
 from django.contrib import messages
 from django.contrib.auth import get_user_model, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -153,6 +155,18 @@ def recruiter_register(request):
 
         if form.is_valid():
             user = form.save()
+
+            profile = user.profile
+            profile.role = Profile.ROLE_RECRUITER
+            profile.recruiter_status = Profile.RECRUITER_PENDING
+            profile.company_name = form.cleaned_data.get("company_name", "")
+            profile.phone = form.cleaned_data.get("phone", "")
+            profile.company_document_type = form.cleaned_data.get("company_document_type", "")
+
+            if form.cleaned_data.get("company_document"):
+                profile.company_document = form.cleaned_data.get("company_document")
+
+            profile.save()
 
             EmailService.recruiter_pending_notice(user)
 
