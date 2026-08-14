@@ -4,6 +4,7 @@ import uuid
 import chromadb
 import requests
 from django.conf import settings
+from openai import OpenAI
 
 
 class RAGService:
@@ -58,30 +59,24 @@ class RAGService:
         return chunks
 
     @staticmethod
-    def embed_text(text):
-        url = settings.OLLAMA_BASE_URL.rstrip("/") + "/api/embeddings"
+    def get_openai_client():
+        if not settings.OPENAI_API_KEY:
+            raise ValueError("OPENAI_API_KEY is missing.")
 
-        payload = {
-            "model": settings.OLLAMA_EMBED_MODEL,
-            "prompt": text,
-        }
-
-        response = requests.post(
-            url,
-            json=payload,
-            timeout=120,
+        return OpenAI(
+            api_key=settings.OPENAI_API_KEY,
         )
 
-        response.raise_for_status()
+    @classmethod
+    def embed_text(cls, text):
+        client = cls.get_openai_client()
 
-        data = response.json()
+        response = client.embeddings.create(
+            model=settings.OPENAI_EMBED_MODEL,
+            input=text,
+        )
 
-        embedding = data.get("embedding")
-
-        if not embedding:
-            raise ValueError("Ollama did not return embedding.")
-
-        return embedding
+        return response.data[0].embedding
 
     @classmethod
     def upsert_record(cls, record_type, record_id, text, metadata=None):

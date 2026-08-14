@@ -5,6 +5,7 @@ import requests
 from django.conf import settings
 
 from .agent_tools import RecruitmentAgentTools
+from .ai_service import AIService
 
 
 class RecruitmentAgentService:
@@ -45,44 +46,40 @@ class RecruitmentAgentService:
         return {}
 
     @staticmethod
-    def call_ollama(messages, json_mode=False):
-        ollama_base_url = getattr(
-            settings,
-            "OLLAMA_BASE_URL",
-            "http://127.0.0.1:11434",
-        )
-
-        ollama_model = getattr(
-            settings,
-            "OLLAMA_MODEL",
-            "qwen3:latest",
-        )
-
-        payload = {
-            "model": ollama_model,
-            "messages": messages,
-            "stream": False,
-            "options": {
-                "temperature": 0.2,
-                "num_predict": 800,
-                "num_ctx": 4096,
-            },
-        }
-
+    def call_ai(messages, json_mode=False):
         if json_mode:
-            payload["format"] = "json"
+            schema = {
+                "type": "object",
+                "properties": {
+                    "tool": {
+                        "type": "string"
+                    },
+                    "arguments_json": {
+                        "type": "string"
+                    },
+                    "reason": {
+                        "type": "string"
+                    },
+                },
+                "required": [
+                    "tool",
+                    "arguments_json",
+                    "reason",
+                ],
+                "additionalProperties": False,
+            }
 
-        response = requests.post(
-            ollama_base_url.rstrip("/") + "/api/chat",
-            json=payload,
-            timeout=300,
+            return AIService.ask_json(
+                messages=messages,
+                schema=schema,
+                schema_name="agent_tool_decision",
+                max_output_tokens=1000,
+            )
+
+        return AIService.ask_text(
+            messages=messages,
+            max_output_tokens=1200,
         )
-
-        response.raise_for_status()
-
-        result = response.json()
-
-        return result.get("message", {}).get("content", "").strip()
 
     @classmethod
     def decide_tool(cls, user, session, user_message):
@@ -198,12 +195,10 @@ Return:
             },
         ]
 
-        response = cls.call_ollama(
-            messages=messages,
-            json_mode=True,
-        )
-
-        data = cls.parse_json(response)
+        data = cls.call_ai(
+    messages=messages,
+    json_mode=True,
+)
 
         return {
             "tool": data.get("tool", "none"),
@@ -253,10 +248,10 @@ Rules:
             },
         ]
 
-        return cls.call_ollama(
-            messages=messages,
-            json_mode=False,
-        )
+        return cls.call_ai(
+    messages=messages,
+    json_mode=False,
+)
 
     @classmethod
     def run_agent(cls, user, session, user_message):

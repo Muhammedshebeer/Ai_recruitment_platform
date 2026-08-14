@@ -17,6 +17,24 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 import os
+from dotenv import load_dotenv
+import dj_database_url
+
+
+load_dotenv()
+
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
+OPENAI_MODEL = os.getenv(
+    "OPENAI_MODEL",
+    "gpt-5-nano",
+)
+
+OPENAI_EMBED_MODEL = os.getenv(
+    "OPENAI_EMBED_MODEL",
+    "text-embedding-3-small",
+)
+
 
 OLLAMA_BASE_URL = os.getenv(
     "OLLAMA_BASE_URL",
@@ -42,12 +60,26 @@ RAG_COLLECTION_NAME = "recruitment_platform_knowledge"
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-&&3u8&-d^(qzo2-*p=7cz_r)==hk%2o0&321qda*n$lk4hb#x&'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.0.59','127.0.0.1','localhost']
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "unsafe-local-secret-key")
+
+DEBUG = os.getenv("DEBUG", "False") == "True"
+
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.getenv("ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
+    if host.strip()
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv(
+        "CSRF_TRUSTED_ORIGINS",
+        "http://127.0.0.1:8000,http://localhost:8000",
+    ).split(",")
+    if origin.strip()
+]
 
 
 # Application definition
@@ -59,17 +91,20 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'resumes',
+    'resumes.apps.ResumesConfig',
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+
+    # keep your other middleware below
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
 LOGIN_URL = "login"
@@ -100,10 +135,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    "default": dj_database_url.config(
+        default=os.getenv("DATABASE_URL", "sqlite:///db.sqlite3"),
+        conn_max_age=600,
+        ssl_require=not DEBUG,
+    )
 }
 
 
@@ -115,10 +151,10 @@ ADMIN_EMAIL = "devuser3777@gmail.com"
 # EMAIL_USE_TLS = True
 # EMAIL_HOST = 'smtp.gmail.com'
 # EMAIL_PORT = 587
-# EMAIL_HOST_USER = 'info@talentpool.ae'                        #sample
-# # EMAIL_HOST_PASSWORD = 'Serv@1234tech'
-# EMAIL_HOST_PASSWORD = 'mqev awrv lxow eixf'
-# DEFAULT_FROM_EMAIL = "devuser3777@gmail.com"
+# EMAIL_HOST_USER = 'devuser3777@gmail.com'                        #sample
+# # EMAIL_HOST_PASSWORD = 'Shebidev@3777'
+# EMAIL_HOST_PASSWORD = 'skkc shfr jami xvco'
+# DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 # SERVER_EMAIL = EMAIL_HOST_USER
 # ADMIN_EMAIL = "devuser3777@gmail.com"
 
@@ -157,7 +193,16 @@ USE_I18N = True
 USE_TZ = True
 
 
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
