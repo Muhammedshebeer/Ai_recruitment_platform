@@ -11,7 +11,7 @@
 
     <title>
         {% block title %}
-            Careerflow
+            CareerFlow
         {% endblock %}
     </title>
 
@@ -30,13 +30,16 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Inter']
+                        sans: ["Inter"]
                     },
                     colors: {
-                        primary: '#3B82F6',
-                        secondary: '#06B6D4',
-                        dark: '#0F172A',
-                        glass: 'rgba(255,255,255,.05)'
+                        primary: "#2563EB",
+                        secondary: "#06B6D4",
+                        skysoft: "#EFF6FF",
+                        dark: "#0F172A",
+                        muted: "#64748B",
+                        surface: "#FFFFFF",
+                        border: "#E2E8F0"
                     }
                 }
             }
@@ -44,141 +47,716 @@
     </script>
 
     <style>
+        :root {
+            --cf-blue: #2563eb;
+            --cf-blue-dark: #1d4ed8;
+            --cf-sky: #0ea5e9;
+            --cf-cyan: #06b6d4;
+            --cf-indigo: #4f46e5;
+            --cf-teal: #14b8a6;
 
-        body{
-            background:#020617;
-            color:white;
-            overflow-x:hidden;
+            --cf-slate: #0f172a;
+            --cf-slate-700: #334155;
+            --cf-muted: #64748b;
+            --cf-light-muted: #94a3b8;
+
+            --cf-white: #ffffff;
+            --cf-bg: #f8fafc;
+            --cf-soft: #f1f5f9;
+            --cf-soft-blue: #eff6ff;
+            --cf-soft-sky: #f0f9ff;
+
+            --cf-border: #e2e8f0;
+            --cf-border-blue: #bfdbfe;
+
+            --cf-success: #16a34a;
+            --cf-warning: #d97706;
+            --cf-danger: #dc2626;
+
+            --cf-shadow-sm: 0 10px 30px rgba(15, 23, 42, 0.07);
+            --cf-shadow-md: 0 24px 70px rgba(15, 23, 42, 0.12);
+            --cf-shadow-lg: 0 32px 90px rgba(15, 23, 42, 0.16);
+            --cf-shadow-blue: 0 24px 70px rgba(37, 99, 235, 0.22);
         }
 
-        .glass{
-            background:rgba(255,255,255,.05);
-            backdrop-filter:blur(18px);
-            border:1px solid rgba(255,255,255,.1);
+        * {
+            scroll-behavior: smooth;
         }
 
-        .gradient-bg{
-            position:fixed;
-            inset:0;
-            z-index:-2;
+        body {
+            background: var(--cf-bg) !important;
+            color: var(--cf-slate) !important;
+            overflow-x: hidden;
+            font-family: Inter, sans-serif;
+        }
+
+        .gradient-bg {
+            position: fixed;
+            inset: 0;
+            z-index: -2;
             background:
-            radial-gradient(circle at 20% 20%,#3B82F655 0%,transparent 30%),
-            radial-gradient(circle at 80% 30%,#06B6D455 0%,transparent 35%),
-            radial-gradient(circle at 50% 80%,#8B5CF655 0%,transparent 40%),
-            #020617;
+                linear-gradient(rgba(37, 99, 235, 0.045) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(37, 99, 235, 0.045) 1px, transparent 1px),
+                radial-gradient(circle at 12% 12%, rgba(37, 99, 235, 0.10), transparent 30%),
+                radial-gradient(circle at 88% 20%, rgba(6, 182, 212, 0.12), transparent 32%),
+                radial-gradient(circle at 50% 95%, rgba(20, 184, 166, 0.08), transparent 38%),
+                linear-gradient(180deg, #ffffff 0%, #f8fafc 48%, #eef6ff 100%) !important;
+            background-size:
+                40px 40px,
+                40px 40px,
+                auto,
+                auto,
+                auto,
+                auto;
         }
 
-        .blob{
-            position:fixed;
-            width:350px;
-            height:350px;
-            border-radius:999px;
-            filter:blur(120px);
-            opacity:.18;
-            animation:float 12s infinite alternate;
+        .gradient-bg::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                180deg,
+                rgba(255, 255, 255, 0.12),
+                rgba(255, 255, 255, 0.68)
+            );
+            pointer-events: none;
         }
 
-        .blob1{
-            background:#3B82F6;
-            left:-100px;
-            top:-100px;
+        .blob {
+            position: fixed;
+            width: 420px;
+            height: 420px;
+            border-radius: 999px;
+            filter: blur(130px);
+            opacity: 0.12 !important;
+            animation: float 12s infinite alternate ease-in-out;
+            z-index: -1;
+            pointer-events: none;
         }
 
-        .blob2{
-            background:#06B6D4;
-            right:-100px;
-            bottom:-100px;
+        .blob1 {
+            background: #2563eb;
+            left: -140px;
+            top: -140px;
         }
 
-        @keyframes float{
-            from{ transform:translateY(0px); }
-            to{ transform:translateY(70px); }
+        .blob2 {
+            background: #06b6d4;
+            right: -140px;
+            bottom: -140px;
         }
 
-        ::-webkit-scrollbar{ width:10px; }
-        ::-webkit-scrollbar-thumb{ background:#334155; border-radius:50px; }
+        @keyframes float {
+            from {
+                transform: translateY(0px);
+            }
 
-        .btn{
-            transition:.3s;
+            to {
+                transform: translateY(70px);
+            }
         }
 
-        .btn:hover{
-            transform:translateY(-3px);
-            box-shadow:0 10px 35px rgba(59,130,246,.4);
+        main {
+            background: transparent !important;
         }
 
-
-        .loader-ring {
-        width: 150px;
-        height: 150px;
-        border-radius: 999px;
-        background:
-            conic-gradient(from 0deg, #3B82F6, #06B6D4, #22C55E, #3B82F6);
-        animation: rotateLoader 1.4s linear infinite;
-        padding: 5px;
-    }
-
-    .loader-ring-inner {
-        width: 100%;
-        height: 100%;
-        border-radius: 999px;
-        background: #020617;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    @keyframes rotateLoader {
-        from {
-            transform: rotate(0deg);
+        .glass {
+            background: rgba(255, 255, 255, 0.88) !important;
+            backdrop-filter: blur(18px);
+            border: 1px solid rgba(226, 232, 240, 0.95) !important;
+            box-shadow: var(--cf-shadow-sm);
+            color: var(--cf-slate) !important;
         }
-        to {
-            transform: rotate(360deg);
+
+        nav.glass {
+            background: #ffffff !important;
+            border-bottom: 1px solid var(--cf-border) !important;
+            box-shadow: 0 8px 30px rgba(15, 23, 42, 0.06) !important;
         }
-    }
 
-    .loader-card {
-        animation: loaderFadeUp .35s ease both;
-    }
+        nav a,
+        nav h1,
+        nav p,
+        nav span {
+            color: var(--cf-slate) !important;
+        }
 
-    @keyframes loaderFadeUp {
-        from {
+        nav a {
+            font-weight: 650;
+        }
+
+        nav a:hover {
+            color: var(--cf-blue) !important;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            color: var(--cf-slate);
+            letter-spacing: -0.04em;
+        }
+        
+        .text-red-600 {
+    --tw-text-opacity: 1;
+    color: rgb(220 38 38 / var(--tw-text-opacity, 1)) !important;
+}
+
+        .rounded-xl {
+            color: white !important;
+        }
+        .text-white {
+    --tw-text-opacity: 1;
+    color: rgb(255 255 255 / var(--tw-text-opacity, 1)) !important;
+}
+
+        p {
+            color: var(--cf-muted);
+        }
+
+        a,
+        button,
+        .btn {
+            transition: all 0.25s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 16px 40px rgba(37, 99, 235, 0.25);
+        }
+
+        .text-gray-300,
+        .text-gray-400,
+        .text-gray-500 {
+            color: var(--cf-muted) !important;
+        }
+
+        .text-cyan-300,
+        .text-cyan-400 {
+            color: var(--cf-cyan) !important;
+        }
+
+        .text-blue-300,
+        .text-blue-400 {
+            color: var(--cf-blue) !important;
+        }
+
+        .text-green-300,
+        .text-green-400 {
+            color: var(--cf-success) !important;
+        }
+
+        .text-red-300,
+        .text-red-400 {
+            color: var(--cf-danger) !important;
+        }
+
+        .text-yellow-300,
+        .text-yellow-400 {
+            color: var(--cf-warning) !important;
+        }
+
+        .border-slate-600,
+        .border-slate-700,
+        .border-slate-800,
+        .border-white\/10 {
+            border-color: var(--cf-border) !important;
+        }
+
+        .bg-slate-950,
+        .bg-slate-900,
+        .bg-slate-800,
+        .bg-slate-700,
+        .bg-slate-950\/70,
+        .bg-slate-950\/40,
+        .bg-white\/5,
+        .bg-white\/10 {
+            background: #ffffff !important;
+            color: var(--cf-slate) !important;
+        }
+
+        .bg-blue-500\/10 {
+            background: #eff6ff !important;
+        }
+
+        .bg-cyan-500\/10 {
+            background: #ecfeff !important;
+        }
+
+        .bg-green-500\/10 {
+            background: #f0fdf4 !important;
+        }
+
+        .bg-red-500\/10 {
+            background: #fef2f2 !important;
+        }
+
+        .bg-yellow-500\/10 {
+            background: #fffbeb !important;
+        }
+
+        input,
+        textarea,
+        select {
+            background: #ffffff !important;
+            color: var(--cf-slate) !important;
+            border: 1px solid var(--cf-border) !important;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: var(--cf-light-muted) !important;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none !important;
+            border-color: var(--cf-blue) !important;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12) !important;
+        }
+
+        table {
+            background: #ffffff;
+            color: var(--cf-slate);
+            border: 1px solid var(--cf-border);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        th {
+            background: #eff6ff;
+            color: #1e3a8a;
+            font-weight: 800;
+        }
+
+        td {
+            color: #334155;
+            border-color: var(--cf-border);
+        }
+
+        footer {
+            background: rgba(255, 255, 255, 0.86) !important;
+            backdrop-filter: blur(18px);
+            border-top: 1px solid var(--cf-border) !important;
+        }
+
+        footer h2 {
+            color: var(--cf-slate) !important;
+        }
+
+        footer p,
+        footer span {
+            color: var(--cf-muted) !important;
+        }
+
+        .alert-message {
+            background: #ffffff;
+            box-shadow: var(--cf-shadow-sm);
+            color: var(--cf-slate) !important;
+        }
+
+        .cf-page {
+            background: transparent;
+            color: var(--cf-slate);
+        }
+
+        .cf-gradient-text {
+            background: linear-gradient(90deg, #2563eb, #06b6d4, #14b8a6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .cf-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 15px;
+            border-radius: 999px;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1d4ed8;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .cf-primary-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 16px 26px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #2563eb, #06b6d4);
+            color: #ffffff !important;
+            font-weight: 800;
+            box-shadow: 0 18px 40px rgba(37, 99, 235, 0.25);
+            transition: all 0.28s ease;
+        }
+
+        .cf-primary-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 24px 55px rgba(37, 99, 235, 0.32);
+        }
+
+        .cf-secondary-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 16px 26px;
+            border-radius: 16px;
+            background: #ffffff;
+            color: #1e40af !important;
+            border: 1px solid #bfdbfe;
+            font-weight: 800;
+            transition: all 0.28s ease;
+        }
+
+        .cf-secondary-btn:hover {
+            background: #eff6ff;
+            transform: translateY(-3px);
+            border-color: #60a5fa;
+        }
+
+        .cf-card {
+            background: #ffffff;
+            border: 1px solid var(--cf-border);
+            border-radius: 30px;
+            box-shadow: var(--cf-shadow-sm);
+            transition: all 0.3s ease;
+        }
+
+        .cf-card:hover {
+            transform: translateY(-7px);
+            box-shadow: var(--cf-shadow-md);
+            border-color: #bfdbfe;
+        }
+
+        .cf-section-title {
+            font-size: clamp(2.3rem, 5vw, 4.5rem);
+            line-height: 1.02;
+            letter-spacing: -0.06em;
+            font-weight: 900;
+            color: var(--cf-slate);
+        }
+
+        .cf-section-subtitle {
+            color: var(--cf-muted);
+            font-size: 1.08rem;
+            line-height: 1.85;
+        }
+
+        .cf-reveal {
             opacity: 0;
-            transform: translateY(18px) scale(.98);
+            transform: translateY(26px);
+            transition: all 0.75s cubic-bezier(.2, .7, .2, 1);
         }
-        to {
+
+        .cf-reveal.cf-visible {
             opacity: 1;
-            transform: translateY(0) scale(1);
-        }
-    }
-
-    .loader-progress {
-        transition: width .45s ease;
-    }
-
-    .loader-dot {
-        animation: loaderDot 1.2s infinite ease-in-out;
-    }
-
-    .loader-dot:nth-child(2) {
-        animation-delay: .15s;
-    }
-
-    .loader-dot:nth-child(3) {
-        animation-delay: .3s;
-    }
-
-    @keyframes loaderDot {
-        0%, 80%, 100% {
-            opacity: .25;
             transform: translateY(0);
         }
-        40% {
-            opacity: 1;
-            transform: translateY(-5px);
-        }
-    }
 
+        .cf-float {
+            animation: cfFloat 5.5s ease-in-out infinite;
+        }
+
+        @keyframes cfFloat {
+            0%, 100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-16px);
+            }
+        }
+
+        .cf-grid-bg {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(37, 99, 235, 0.06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(37, 99, 235, 0.06) 1px, transparent 1px);
+            background-size: 44px 44px;
+            mask-image: linear-gradient(to bottom, black, transparent 85%);
+            pointer-events: none;
+        }
+
+        .cf-low-image {
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(90deg, rgba(248, 250, 252, 0.96), rgba(248, 250, 252, 0.78)),
+                url("https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1800&q=80");
+            background-size: cover;
+            background-position: center;
+            opacity: 1;
+            pointer-events: none;
+        }
+
+        .cf-orb {
+            position: absolute;
+            width: 360px;
+            height: 360px;
+            border-radius: 999px;
+            filter: blur(95px);
+            opacity: 0.22;
+            pointer-events: none;
+        }
+
+        .cf-mini-line {
+            position: absolute;
+            left: 26px;
+            top: 56px;
+            bottom: -25px;
+            width: 1px;
+            background: linear-gradient(#bfdbfe, transparent);
+        }
+
+        .cf-dashboard-shell {
+            background:
+                radial-gradient(circle at top right, rgba(14, 165, 233, 0.18), transparent 35%),
+                linear-gradient(145deg, #ffffff, #f8fafc);
+        }
+
+        .cf-glow-border {
+            position: relative;
+        }
+
+        .cf-glow-border::before {
+            content: "";
+            position: absolute;
+            inset: -1px;
+            border-radius: inherit;
+            background: linear-gradient(
+                135deg,
+                rgba(37, 99, 235, 0.45),
+                rgba(6, 182, 212, 0.25),
+                rgba(20, 184, 166, 0.25)
+            );
+            z-index: -1;
+            opacity: 0.8;
+        }
+
+        .cf-icon-box {
+            width: 56px;
+            height: 56px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 23px;
+        }
+
+        .cf-image-card {
+            background:
+                linear-gradient(135deg, rgba(15, 23, 42, 0.72), rgba(30, 64, 175, 0.72)),
+                url("https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1600&q=80");
+            background-size: cover;
+            background-position: center;
+        }
+
+        .cf-dark-panel {
+            background:
+                radial-gradient(circle at top right, rgba(56, 189, 248, 0.28), transparent 38%),
+                linear-gradient(135deg, #0f172a, #1e3a8a);
+        }
+
+        .cf-dark-panel,
+        .cf-dark-panel h1,
+        .cf-dark-panel h2,
+        .cf-dark-panel h3,
+        .cf-dark-panel h4,
+        .cf-dark-panel p,
+        .cf-dark-panel span {
+            color: #ffffff !important;
+        }
+
+        .cf-job-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 26px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+            transition: all 0.3s ease;
+        }
+
+        .cf-job-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 24px 65px rgba(37, 99, 235, 0.15);
+            border-color: #bfdbfe;
+        }
+
+        .cf-marquee {
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .cf-marquee-inner {
+            display: inline-flex;
+            gap: 18px;
+            animation: cfMarquee 22s linear infinite;
+        }
+
+        @keyframes cfMarquee {
+            from {
+                transform: translateX(0);
+            }
+
+            to {
+                transform: translateX(-50%);
+            }
+        }
+
+        .loader-ring {
+            width: 150px;
+            height: 150px;
+            border-radius: 999px;
+            background:
+                conic-gradient(from 0deg, #2563eb, #06b6d4, #14b8a6, #2563eb);
+            animation: rotateLoader 1.4s linear infinite;
+            padding: 5px;
+        }
+
+        .loader-ring-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 999px;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes rotateLoader {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loader-card {
+            animation: loaderFadeUp .35s ease both;
+        }
+
+        @keyframes loaderFadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(18px) scale(.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .loader-progress {
+            transition: width .45s ease;
+        }
+
+        .loader-dot {
+            animation: loaderDot 1.2s infinite ease-in-out;
+        }
+
+        .loader-dot:nth-child(2) {
+            animation-delay: .15s;
+        }
+
+        .loader-dot:nth-child(3) {
+            animation-delay: .3s;
+        }
+
+        @keyframes loaderDot {
+            0%, 80%, 100% {
+                opacity: .25;
+                transform: translateY(0);
+            }
+
+            40% {
+                opacity: 1;
+                transform: translateY(-5px);
+            }
+        }
+
+        #loadingOverlay {
+            background: rgba(248, 250, 252, 0.88) !important;
+            color: var(--cf-slate) !important;
+        }
+
+        #aiAgentPanel {
+            background: #ffffff !important;
+            border: 1px solid var(--cf-border-blue) !important;
+            box-shadow: var(--cf-shadow-lg) !important;
+        }
+
+        #aiAgentPanel h3 {
+            color: var(--cf-slate) !important;
+        }
+
+        #aiAgentHeader {
+            background: #ffffff !important;
+            border-bottom: 1px solid var(--cf-border) !important;
+        }
+
+        #aiAgentMessages {
+            background: #f8fafc !important;
+        }
+
+        #aiAgentForm {
+            background: #ffffff !important;
+            border-top: 1px solid var(--cf-border) !important;
+        }
+
+        #aiAgentInput {
+            background: #f8fafc !important;
+            border: 1px solid var(--cf-border) !important;
+            color: var(--cf-slate) !important;
+        }
+
+        #aiAgentClose {
+            background: #f1f5f9 !important;
+            color: var(--cf-muted) !important;
+        }
+
+        #aiAgentClose:hover {
+            background: #fee2e2 !important;
+            color: var(--cf-danger) !important;
+        }
+
+        .ai-agent-message {
+            background: #ffffff !important;
+            color: var(--cf-slate) !important;
+            border: 1px solid var(--cf-border) !important;
+        }
+
+        .ai-agent-tool {
+            border-top: 1px solid var(--cf-border) !important;
+            color: var(--cf-muted) !important;
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #bfdbfe;
+            border-radius: 50px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2563eb;
+        }
     </style>
 
     {% block extra_css %}
@@ -203,11 +781,8 @@
             <a href="{% url 'home' %}"
                class="flex items-center gap-3">
 
-                <div
-                        class="w-11 h-11 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center">
-
-                    <i class="fa-solid fa-robot text-xl"></i>
-
+                <div class="w-11 h-11 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                    <i class="fa-solid fa-robot text-xl text-white"></i>
                 </div>
 
                 <div>
@@ -224,183 +799,166 @@
 
             </a>
 
-            <div class="hidden md:flex gap-7 text-sm">
+            <div class="hidden md:flex gap-7 text-sm items-center">
 
-    <a href="{% url 'home' %}" class="hover:text-cyan-400 transition">
-        Home
-    </a>
+                <a href="{% url 'home' %}" class="hover:text-cyan-400 transition">
+                    Home
+                </a>
 
-    {% if request.user.is_authenticated %}
+                {% if request.user.is_authenticated %}
 
-        {% if request.user.is_staff %}
+                    {% if request.user.is_staff %}
 
-            <!-- ADMIN NAVBAR -->
-            <a href="{% url 'platform_admin_dashboard' %}" class="hover:text-cyan-400 transition">
-                Platform Admin
-            </a>
+                        <a href="{% url 'platform_admin_dashboard' %}" class="hover:text-cyan-400 transition">
+                            Platform Admin
+                        </a>
 
-            <a href="{% url 'platform_admin_recruiters' %}" class="hover:text-cyan-400 transition">
-                Manage Recruiters
-            </a>
+                        <a href="{% url 'platform_admin_recruiters' %}" class="hover:text-cyan-400 transition">
+                            Manage Recruiters
+                        </a>
 
-            <a href="{% url 'platform_admin_reported_jobs' %}" class="hover:text-cyan-400 transition">
-                Reported Jobs
-            </a>
+                        <a href="{% url 'platform_admin_reported_jobs' %}" class="hover:text-cyan-400 transition">
+                            Reported Jobs
+                        </a>
 
-            <a href="{% url 'job_list' %}" class="hover:text-cyan-400 transition">
-                Jobs
-            </a>
+                        <a href="{% url 'job_list' %}" class="hover:text-cyan-400 transition">
+                            Jobs
+                        </a>
 
-            <a href="{% url 'companies' %}" class="hover:text-cyan-400 transition">
-                Companies
-            </a>
-            <a href="{% url 'chatbot_page' %}" class="hover:text-cyan-400 transition">
-    AI Chatbot
-</a>
+                        <a href="{% url 'companies' %}" class="hover:text-cyan-400 transition">
+                            Companies
+                        </a>
 
-            <a href="{% url 'admin:index' %}" class="hover:text-cyan-400 transition">
-                Django Admin
-            </a>
+                        <a href="{% url 'chatbot_page' %}" class="hover:text-cyan-400 transition">
+                            AI Chatbot
+                        </a>
 
-        {% elif request.user.profile.role == "recruiter" %}
+                        <a href="{% url 'admin:index' %}" class="hover:text-cyan-400 transition">
+                            Django Admin
+                        </a>
 
-            <!-- RECRUITER NAVBAR -->
-            <a href="{% url 'recruiter_dashboard' %}" class="hover:text-cyan-400 transition">
-                Recruiter Dashboard
-            </a>
+                    {% elif request.user.profile.role == "recruiter" %}
 
-            <a href="{% url 'recruiter_jobs' %}" class="hover:text-cyan-400 transition">
-                My Jobs
-            </a>
+                        <a href="{% url 'recruiter_dashboard' %}" class="hover:text-cyan-400 transition">
+                            Recruiter Dashboard
+                        </a>
 
-            <a href="{% url 'recruiter_applications' %}" class="hover:text-cyan-400 transition">
-                Applications
-            </a>
+                        <a href="{% url 'recruiter_jobs' %}" class="hover:text-cyan-400 transition">
+                            My Jobs
+                        </a>
 
-            <a href="{% url 'recruiter_candidate_search' %}" class="hover:text-cyan-400 transition">
-                Candidates
-            </a>
+                        <a href="{% url 'recruiter_applications' %}" class="hover:text-cyan-400 transition">
+                            Applications
+                        </a>
 
-            <a href="{% url 'recruiter_company_profile' %}" class="hover:text-cyan-400 transition">
-                Company Profile
-            </a>
-            <a href="{% url 'chatbot_page' %}" class="hover:text-cyan-400 transition">
-    AI Chatbot
-</a>
+                        <a href="{% url 'recruiter_candidate_search' %}" class="hover:text-cyan-400 transition">
+                            Candidates
+                        </a>
 
-        {% else %}
+                        <a href="{% url 'recruiter_company_profile' %}" class="hover:text-cyan-400 transition">
+                            Company Profile
+                        </a>
 
-            <!-- JOB SEEKER NAVBAR -->
-            <a href="{% url 'dashboard' %}" class="hover:text-cyan-400 transition">
-                Dashboard
-            </a>
+                        <a href="{% url 'chatbot_page' %}" class="hover:text-cyan-400 transition">
+                            AI Chatbot
+                        </a>
 
-            <a href="{% url 'upload_resume' %}" class="hover:text-cyan-400 transition">
-                Resume Checker
-            </a>
+                    {% else %}
 
-            <a href="{% url 'job_list' %}" class="hover:text-cyan-400 transition">
-                Jobs
-            </a>
+                        <a href="{% url 'dashboard' %}" class="hover:text-cyan-400 transition">
+                            Dashboard
+                        </a>
 
-            <a href="{% url 'saved_jobs' %}" class="hover:text-cyan-400 transition">
-                Saved Jobs
-            </a>
+                        <a href="{% url 'upload_resume' %}" class="hover:text-cyan-400 transition">
+                            Resume Checker
+                        </a>
 
-            <a href="{% url 'resume_history' %}" class="hover:text-cyan-400 transition">
-                History
-            </a>
+                        <a href="{% url 'job_list' %}" class="hover:text-cyan-400 transition">
+                            Jobs
+                        </a>
 
-            <a href="{% url 'chatbot_page' %}" class="hover:text-cyan-400 transition">
-    AI Chatbot
-</a>
+                        <a href="{% url 'saved_jobs' %}" class="hover:text-cyan-400 transition">
+                            Saved Jobs
+                        </a>
 
-            <a href="{% url 'candidate_profile_settings' %}" class="hover:text-cyan-400 transition">
-                Profile
-            </a>
+                        <a href="{% url 'resume_history' %}" class="hover:text-cyan-400 transition">
+                            History
+                        </a>
 
-        {% endif %}
+                        <a href="{% url 'chatbot_page' %}" class="hover:text-cyan-400 transition">
+                            AI Chatbot
+                        </a>
 
-    {% else %}
+                        <a href="{% url 'candidate_profile_settings' %}" class="hover:text-cyan-400 transition">
+                            Profile
+                        </a>
 
-        <!-- PUBLIC NAVBAR -->
-        <a href="{% url 'job_list' %}" class="hover:text-cyan-400 transition">
-            Jobs
-        </a>
+                    {% endif %}
 
-        <a href="{% url 'companies' %}" class="hover:text-cyan-400 transition">
-            Companies
-        </a>
+                {% else %}
 
-        <!-- <a href="{% url 'login' %}" class="hover:text-cyan-400 transition">
-            Job Seeker Login
-        </a>
+                    <a href="{% url 'job_list' %}" class="hover:text-cyan-400 transition">
+                        Jobs
+                    </a>
 
-        <a href="{% url 'recruiter_login' %}" class="hover:text-cyan-400 transition">
-            Recruiter Login
-        </a> -->
+                    <a href="{% url 'companies' %}" class="hover:text-cyan-400 transition">
+                        Companies
+                    </a>
 
-    {% endif %}
+                {% endif %}
 
-</div>
+            </div>
 
             {% if request.user.is_authenticated %}
 
-    <div class="flex items-center gap-4">
+                <div class="flex items-center gap-4">
 
-        <div class="hidden lg:block text-right">
+                    <div class="hidden lg:block text-right">
 
-            <p class="text-sm font-semibold">
-                {{ request.user.username }}
-            </p>
+                        <p class="text-sm font-semibold">
+                            {{ request.user.username }}
+                        </p>
 
-            {% if request.user.is_staff %}
-                <p class="text-xs text-red-300">
-                    Platform Admin
-                </p>
-            {% elif request.user.profile.role == "recruiter" %}
-                <p class="text-xs text-cyan-300">
-                    Recruiter
-                </p>
+                        {% if request.user.is_staff %}
+                            <p class="text-xs text-red-300">
+                                Platform Admin
+                            </p>
+                        {% elif request.user.profile.role == "recruiter" %}
+                            <p class="text-xs text-cyan-300">
+                                Recruiter
+                            </p>
+                        {% else %}
+                            <p class="text-xs text-blue-300">
+                                Job Seeker
+                            </p>
+                        {% endif %}
+
+                    </div>
+
+                    <a href="{% url 'logout' %}"
+                       class="px-5 py-3 rounded-xl border border-red-200 bg-red-50 hover:bg-red-100 text-red-600 text-sm font-bold">
+                        Logout
+                    </a>
+
+                </div>
+
             {% else %}
-                <p class="text-xs text-blue-300">
-                    Job Seeker
-                </p>
+
+                <div class="flex gap-3">
+
+                    <a href="{% url 'login' %}"
+                       class="cf-secondary-btn hidden sm:inline-flex px-5 py-3 text-sm">
+                        Job Seeker
+                    </a>
+
+                    <a href="{% url 'recruiter_login' %}"
+                       class="cf-primary-btn px-5 py-3 text-sm">
+                        Recruiter
+                    </a>
+
+                </div>
+
             {% endif %}
-
-        </div>
-
-        <!-- {% if request.user.is_staff %}
-            <a href="{% url 'platform_admin_dashboard' %}"
-               class="hidden sm:inline-block px-5 py-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-sm font-semibold">
-                Admin
-            </a>
-        {% endif %} -->
-
-        <a href="{% url 'logout' %}"
-           class="px-5 py-3 rounded-xl border border-slate-600 hover:border-red-400 text-sm font-semibold">
-            Logout
-        </a>
-
-    </div>
-
-{% else %}
-
-    <div class="flex gap-3">
-
-        <a href="{% url 'login' %}"
-           class="hidden sm:inline-block px-5 py-3 rounded-xl border border-slate-600 hover:border-blue-400 font-semibold">
-            Job Seeker
-        </a>
-
-        <a href="{% url 'recruiter_login' %}"
-           class="btn px-5 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 font-semibold">
-            Recruiter
-        </a>
-
-    </div>
-
-{% endif %}
 
         </div>
 
@@ -447,19 +1005,18 @@
 
 </main>
 
-<footer class="mt-20 border-t border-slate-700">
+<footer class="mt-20 border-t border-slate-200">
 
-    <div
-            class="max-w-7xl mx-auto py-12 px-8 flex flex-col md:flex-row justify-between items-center">
+    <div class="max-w-7xl mx-auto py-12 px-8 flex flex-col md:flex-row justify-between items-center">
 
         <div>
 
             <h2 class="font-bold text-lg">
-                AI Recruitment Platform
+                CareerFlow
             </h2>
 
             <p class="text-gray-400 mt-2">
-                Built with Django • Ollama • TailwindCSS
+                Built with Django • OpenAI • TailwindCSS
             </p>
 
         </div>
@@ -476,7 +1033,7 @@
 
 <div
         id="loadingOverlay"
-        class="hidden fixed inset-0 bg-black/85 backdrop-blur-xl z-[999] flex items-center justify-center px-6">
+        class="hidden fixed inset-0 backdrop-blur-xl z-[999] flex items-center justify-center px-6">
 
     <div class="loader-card glass rounded-[2rem] p-10 max-w-xl w-full text-center shadow-2xl">
 
@@ -522,7 +1079,7 @@
 
             </div>
 
-            <div class="w-full h-3 rounded-full bg-slate-800 overflow-hidden">
+            <div class="w-full h-3 rounded-full bg-slate-100 overflow-hidden">
 
                 <div
                         id="loaderProgressBar"
@@ -536,22 +1093,22 @@
 
         <div class="mt-8 grid grid-cols-2 gap-3 text-left text-sm">
 
-            <div id="loaderStep1" class="rounded-2xl bg-white/5 border border-white/10 p-4">
+            <div id="loaderStep1" class="rounded-2xl bg-white border border-slate-200 p-4">
                 <i class="fa-solid fa-file-pdf text-red-400 mr-2"></i>
                 Reading PDF
             </div>
 
-            <div id="loaderStep2" class="rounded-2xl bg-white/5 border border-white/10 p-4">
+            <div id="loaderStep2" class="rounded-2xl bg-white border border-slate-200 p-4">
                 <i class="fa-solid fa-font text-blue-400 mr-2"></i>
                 Extracting Text
             </div>
 
-            <div id="loaderStep3" class="rounded-2xl bg-white/5 border border-white/10 p-4">
+            <div id="loaderStep3" class="rounded-2xl bg-white border border-slate-200 p-4">
                 <i class="fa-solid fa-brain text-cyan-400 mr-2"></i>
                 AI Analysis
             </div>
 
-            <div id="loaderStep4" class="rounded-2xl bg-white/5 border border-white/10 p-4">
+            <div id="loaderStep4" class="rounded-2xl bg-white border border-slate-200 p-4">
                 <i class="fa-solid fa-chart-line text-green-400 mr-2"></i>
                 Preparing Report
             </div>
@@ -570,12 +1127,10 @@
 
 <div id="aiAgentWidget" class="fixed right-6 bottom-4 sm:right-12 sm:bottom-6 z-[9999]">
 
-    <!-- Chat Window -->
     <div id="aiAgentPanel"
          class="hidden w-[380px] max-w-[calc(100vw-3rem)] h-[560px] mb-5 glass rounded-3xl shadow-2xl overflow-hidden border border-cyan-500/20">
 
-        <!-- Header -->
-        <div class="p-5 border-b border-slate-700 bg-slate-950/70">
+        <div id="aiAgentHeader" class="p-5 border-b border-slate-200 bg-white">
 
             <div class="flex items-center justify-between">
 
@@ -599,13 +1154,12 @@
 
                 <button type="button"
                         id="aiAgentClose"
-                        class="w-9 h-9 rounded-xl bg-white/5 hover:bg-red-500/20 text-gray-400 hover:text-red-300 transition">
+                        class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-red-500/20 text-gray-400 hover:text-red-300 transition">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
 
             </div>
 
-            <!-- New Chat + Clear All -->
             <div class="grid grid-cols-2 gap-3 mt-5">
 
                 <button type="button"
@@ -626,20 +1180,18 @@
 
         </div>
 
-        <!-- Messages -->
         <div id="aiAgentMessages"
-             class="h-[340px] overflow-y-auto p-5 space-y-4 bg-slate-950/40">
+             class="h-[340px] overflow-y-auto p-5 space-y-4 bg-slate-50">
 
             <div class="flex justify-start">
-                <div class="max-w-[85%] rounded-2xl rounded-tl-none bg-white/5 border border-slate-700 px-4 py-3 text-sm text-gray-300">
+                <div class="ai-agent-message max-w-[85%] rounded-2xl rounded-tl-none px-4 py-3 text-sm">
                     Hi {{ request.user.username }}, I can help with resumes, jobs, candidates, applications, and recruitment decisions.
                 </div>
             </div>
 
         </div>
 
-        <!-- Input -->
-        <form id="aiAgentForm" class="p-4 border-t border-slate-700 bg-slate-950/70">
+        <form id="aiAgentForm" class="p-2 border-t border-slate-200 bg-white">
             {% csrf_token %}
 
             <input type="hidden" id="aiAgentSessionId" value="">
@@ -650,11 +1202,11 @@
                        id="aiAgentInput"
                        placeholder="Ask your agent..."
                        autocomplete="off"
-                       class="flex-1 rounded-2xl bg-slate-900 border border-slate-700 px-4 py-3 text-sm outline-none focus:border-cyan-400">
+                       class="flex-1 rounded-2xl bg-slate-50 border border-slate-200 px-4 py-3 text-sm outline-none focus:border-cyan-400">
 
                 <button type="submit"
                         id="aiAgentSend"
-                        class="w-12 h-12 rounded-2xl bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center">
+                        class="w-12 h-12 rounded-2xl bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center text-white">
                     <i class="fa-solid fa-paper-plane"></i>
                 </button>
 
@@ -664,14 +1216,13 @@
 
     </div>
 
-    <!-- Floating Button -->
     <button type="button"
             id="aiAgentToggle"
             class="relative w-20 h-20 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 shadow-2xl shadow-cyan-500/30 flex items-center justify-center hover:scale-110 transition">
 
         <span class="absolute inset-0 rounded-full bg-cyan-400/30 animate-ping"></span>
 
-        <span class="relative w-16 h-16 rounded-full bg-slate-950/20 flex items-center justify-center">
+        <span class="relative w-16 h-16 rounded-full bg-white/20 flex items-center justify-center">
 
             <svg width="38" height="38" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect x="14" y="18" width="36" height="32" rx="10" fill="white"/>
@@ -691,295 +1242,295 @@
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    const toggleButton = document.getElementById("aiAgentToggle");
-    const closeButton = document.getElementById("aiAgentClose");
-    const panel = document.getElementById("aiAgentPanel");
-    const form = document.getElementById("aiAgentForm");
-    const input = document.getElementById("aiAgentInput");
-    const sendButton = document.getElementById("aiAgentSend");
-    const messagesBox = document.getElementById("aiAgentMessages");
-    const sessionInput = document.getElementById("aiAgentSessionId");
-    const newChatButton = document.getElementById("aiAgentNewChat");
-    const clearChatsButton = document.getElementById("aiAgentClearChats");
+    document.addEventListener("DOMContentLoaded", function () {
+        const toggleButton = document.getElementById("aiAgentToggle");
+        const closeButton = document.getElementById("aiAgentClose");
+        const panel = document.getElementById("aiAgentPanel");
+        const form = document.getElementById("aiAgentForm");
+        const input = document.getElementById("aiAgentInput");
+        const sendButton = document.getElementById("aiAgentSend");
+        const messagesBox = document.getElementById("aiAgentMessages");
+        const sessionInput = document.getElementById("aiAgentSessionId");
+        const newChatButton = document.getElementById("aiAgentNewChat");
+        const clearChatsButton = document.getElementById("aiAgentClearChats");
 
-    let loaded = false;
+        let loaded = false;
 
-    if (
-        !toggleButton ||
-        !closeButton ||
-        !panel ||
-        !form ||
-        !input ||
-        !sendButton ||
-        !messagesBox ||
-        !sessionInput ||
-        !newChatButton ||
-        !clearChatsButton
-    ) {
-        console.error("AI Agent widget element missing. Check base.html IDs.");
-        return;
-    }
-
-    function escapeHtml(text) {
-        const div = document.createElement("div");
-        div.textContent = text || "";
-        return div.innerHTML;
-    }
-
-    function scrollBottom() {
-        messagesBox.scrollTop = messagesBox.scrollHeight;
-    }
-
-    function getCsrfToken() {
-        const csrfInput = form.querySelector("[name=csrfmiddlewaretoken]");
-
-        if (!csrfInput) {
-            console.error("CSRF token missing in AI Agent form.");
-            return "";
+        if (
+            !toggleButton ||
+            !closeButton ||
+            !panel ||
+            !form ||
+            !input ||
+            !sendButton ||
+            !messagesBox ||
+            !sessionInput ||
+            !newChatButton ||
+            !clearChatsButton
+        ) {
+            console.error("AI Agent widget element missing. Check base.html IDs.");
+            return;
         }
 
-        return csrfInput.value;
-    }
+        function escapeHtml(text) {
+            const div = document.createElement("div");
+            div.textContent = text || "";
+            return div.innerHTML;
+        }
 
-    function setDefaultWelcomeMessage() {
-        messagesBox.innerHTML = `
-            <div class="flex justify-start">
-                <div class="max-w-[85%] rounded-2xl rounded-tl-none bg-white/5 border border-slate-700 px-4 py-3 text-sm text-gray-300">
-                    Hi {{ request.user.username }}, I can help with resumes, jobs, candidates, applications, and recruitment decisions.
-                </div>
-            </div>
-        `;
+        function scrollBottom() {
+            messagesBox.scrollTop = messagesBox.scrollHeight;
+        }
 
-        scrollBottom();
-    }
+        function getCsrfToken() {
+            const csrfInput = form.querySelector("[name=csrfmiddlewaretoken]");
 
-    function addMessage(role, content, toolName = "") {
-        const wrapper = document.createElement("div");
+            if (!csrfInput) {
+                console.error("CSRF token missing in AI Agent form.");
+                return "";
+            }
 
-        if (role === "user") {
-            wrapper.className = "flex justify-end";
+            return csrfInput.value;
+        }
 
-            wrapper.innerHTML = `
-                <div class="max-w-[85%] rounded-2xl rounded-tr-none bg-gradient-to-r from-blue-500 to-cyan-500 px-4 py-3 text-sm text-white">
-                    ${escapeHtml(content).replace(/\n/g, "<br>")}
+        function setDefaultWelcomeMessage() {
+            messagesBox.innerHTML = `
+                <div class="flex justify-start">
+                    <div class="ai-agent-message max-w-[85%] rounded-2xl rounded-tl-none px-4 py-3 text-sm">
+                        Hi {{ request.user.username }}, I can help with resumes, jobs, candidates, applications, and recruitment decisions.
+                    </div>
                 </div>
             `;
-        } else {
-            wrapper.className = "flex justify-start";
 
-            let toolHtml = "";
+            scrollBottom();
+        }
 
-            if (toolName) {
-                toolHtml = `
-                    <div class="mt-3 pt-3 border-t border-slate-700 text-[11px] text-gray-500">
-                        Tool used: ${escapeHtml(toolName)}
+        function addMessage(role, content, toolName = "") {
+            const wrapper = document.createElement("div");
+
+            if (role === "user") {
+                wrapper.className = "flex justify-end";
+
+                wrapper.innerHTML = `
+                    <div class="max-w-[85%] rounded-2xl rounded-tr-none bg-gradient-to-r from-blue-500 to-cyan-500 px-4 py-3 text-sm text-white">
+                        ${escapeHtml(content).replace(/\n/g, "<br>")}
+                    </div>
+                `;
+            } else {
+                wrapper.className = "flex justify-start";
+
+                let toolHtml = "";
+
+                if (toolName) {
+                    toolHtml = `
+                        <div class="ai-agent-tool mt-3 pt-3 text-[11px]">
+                            Tool used: ${escapeHtml(toolName)}
+                        </div>
+                    `;
+                }
+
+                wrapper.innerHTML = `
+                    <div class="ai-agent-message max-w-[85%] rounded-2xl rounded-tl-none px-4 py-3 text-sm">
+                        ${escapeHtml(content).replace(/\n/g, "<br>")}
+                        ${toolHtml}
                     </div>
                 `;
             }
 
+            messagesBox.appendChild(wrapper);
+            scrollBottom();
+        }
+
+        function addThinking() {
+            removeThinking();
+
+            const wrapper = document.createElement("div");
+            wrapper.id = "aiAgentThinking";
+            wrapper.className = "flex justify-start";
+
             wrapper.innerHTML = `
-                <div class="max-w-[85%] rounded-2xl rounded-tl-none bg-white/5 border border-slate-700 px-4 py-3 text-sm text-gray-300">
-                    ${escapeHtml(content).replace(/\n/g, "<br>")}
-                    ${toolHtml}
+                <div class="ai-agent-message rounded-2xl rounded-tl-none px-4 py-3 text-sm text-gray-400">
+                    <i class="fa-solid fa-spinner animate-spin mr-2"></i>
+                    Agent is checking your data...
                 </div>
             `;
+
+            messagesBox.appendChild(wrapper);
+            scrollBottom();
         }
 
-        messagesBox.appendChild(wrapper);
-        scrollBottom();
-    }
+        function removeThinking() {
+            const thinking = document.getElementById("aiAgentThinking");
 
-    function addThinking() {
-        removeThinking();
-
-        const wrapper = document.createElement("div");
-        wrapper.id = "aiAgentThinking";
-        wrapper.className = "flex justify-start";
-
-        wrapper.innerHTML = `
-            <div class="rounded-2xl rounded-tl-none bg-white/5 border border-slate-700 px-4 py-3 text-sm text-gray-400">
-                <i class="fa-solid fa-spinner animate-spin mr-2"></i>
-                Agent is checking your data...
-            </div>
-        `;
-
-        messagesBox.appendChild(wrapper);
-        scrollBottom();
-    }
-
-    function removeThinking() {
-        const thinking = document.getElementById("aiAgentThinking");
-
-        if (thinking) {
-            thinking.remove();
-        }
-    }
-
-    function loadAgentSession() {
-        if (loaded) {
-            return;
+            if (thinking) {
+                thinking.remove();
+            }
         }
 
-        fetch("{% url 'ai_agent_widget_bootstrap' %}")
-            .then(function (response) {
-                return response.json();
-            })
-            .then(function (data) {
-                if (data.success) {
-                    sessionInput.value = data.session_id;
+        function loadAgentSession() {
+            if (loaded) {
+                return;
+            }
 
-                    if (data.messages && data.messages.length > 0) {
-                        messagesBox.innerHTML = "";
+            fetch("{% url 'ai_agent_widget_bootstrap' %}")
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (data) {
+                    if (data.success) {
+                        sessionInput.value = data.session_id;
 
-                        data.messages.forEach(function (message) {
-                            addMessage(
-                                message.role === "user" ? "user" : "agent",
-                                message.content,
-                                message.tool_name || ""
-                            );
-                        });
+                        if (data.messages && data.messages.length > 0) {
+                            messagesBox.innerHTML = "";
+
+                            data.messages.forEach(function (message) {
+                                addMessage(
+                                    message.role === "user" ? "user" : "agent",
+                                    message.content,
+                                    message.tool_name || ""
+                                );
+                            });
+                        }
+
+                        loaded = true;
+                        scrollBottom();
+                    } else {
+                        addMessage("agent", "Unable to load AI agent session.");
                     }
-
-                    loaded = true;
-                    scrollBottom();
-                } else {
+                })
+                .catch(function (error) {
+                    console.error("AI Agent bootstrap failed:", error);
                     addMessage("agent", "Unable to load AI agent session.");
-                }
+                });
+        }
+
+        toggleButton.addEventListener("click", function () {
+            panel.classList.toggle("hidden");
+
+            if (!panel.classList.contains("hidden")) {
+                loadAgentSession();
+
+                setTimeout(function () {
+                    input.focus();
+                    scrollBottom();
+                }, 200);
+            }
+        });
+
+        closeButton.addEventListener("click", function () {
+            panel.classList.add("hidden");
+        });
+
+        newChatButton.addEventListener("click", function () {
+            const formData = new FormData();
+            formData.append("csrfmiddlewaretoken", getCsrfToken());
+
+            fetch("{% url 'ai_agent_widget_new_session' %}", {
+                method: "POST",
+                body: formData,
             })
-            .catch(function (error) {
-                console.error("AI Agent bootstrap failed:", error);
-                addMessage("agent", "Unable to load AI agent session.");
-            });
-    }
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (data) {
+                    if (data.success) {
+                        sessionInput.value = data.session_id;
+                        loaded = true;
+                        setDefaultWelcomeMessage();
+                        input.focus();
+                    } else {
+                        addMessage("agent", data.error || "Unable to start a new chat.");
+                    }
+                })
+                .catch(function (error) {
+                    console.error("New chat failed:", error);
+                    addMessage("agent", "New chat request failed.");
+                });
+        });
 
-    toggleButton.addEventListener("click", function () {
-        panel.classList.toggle("hidden");
+        clearChatsButton.addEventListener("click", function () {
+            const confirmed = confirm("Are you sure you want to clear all AI Agent chats?");
 
-        if (!panel.classList.contains("hidden")) {
-            loadAgentSession();
-
-            setTimeout(function () {
-                input.focus();
-                scrollBottom();
-            }, 200);
-        }
-    });
-
-    closeButton.addEventListener("click", function () {
-        panel.classList.add("hidden");
-    });
-
-    newChatButton.addEventListener("click", function () {
-        const formData = new FormData();
-        formData.append("csrfmiddlewaretoken", getCsrfToken());
-
-        fetch("{% url 'ai_agent_widget_new_session' %}", {
-            method: "POST",
-            body: formData,
-        })
-        .then(function (response) {
-            return response.json();
-        })
-        .then(function (data) {
-            if (data.success) {
-                sessionInput.value = data.session_id;
-                loaded = true;
-                setDefaultWelcomeMessage();
-                input.focus();
-            } else {
-                addMessage("agent", data.error || "Unable to start a new chat.");
+            if (!confirmed) {
+                return;
             }
-        })
-        .catch(function (error) {
-            console.error("New chat failed:", error);
-            addMessage("agent", "New chat request failed.");
+
+            const formData = new FormData();
+            formData.append("csrfmiddlewaretoken", getCsrfToken());
+
+            fetch("{% url 'ai_agent_widget_clear_all_chats' %}", {
+                method: "POST",
+                body: formData,
+            })
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (data) {
+                    if (data.success) {
+                        sessionInput.value = data.session_id;
+                        loaded = true;
+                        setDefaultWelcomeMessage();
+                        input.focus();
+                    } else {
+                        addMessage("agent", data.error || "Unable to clear chats.");
+                    }
+                })
+                .catch(function (error) {
+                    console.error("Clear chats failed:", error);
+                    addMessage("agent", "Clear chat request failed.");
+                });
+        });
+
+        form.addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const message = input.value.trim();
+
+            if (!message) {
+                return;
+            }
+
+            addMessage("user", message);
+
+            input.value = "";
+            sendButton.disabled = true;
+            sendButton.classList.add("opacity-60");
+
+            addThinking();
+
+            const formData = new FormData();
+            formData.append("session_id", sessionInput.value);
+            formData.append("message", message);
+            formData.append("csrfmiddlewaretoken", getCsrfToken());
+
+            fetch("{% url 'ai_agent_widget_send' %}", {
+                method: "POST",
+                body: formData,
+            })
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (data) {
+                    removeThinking();
+
+                    if (data.success) {
+                        sessionInput.value = data.session_id;
+                        addMessage("agent", data.reply, data.tool_name || "");
+                    } else {
+                        addMessage("agent", data.error || "Something went wrong.");
+                    }
+                })
+                .catch(function (error) {
+                    console.error("AI Agent send failed:", error);
+                    removeThinking();
+                    addMessage("agent", "AI agent request failed. Please try again.");
+                })
+                .finally(function () {
+                    sendButton.disabled = false;
+                    sendButton.classList.remove("opacity-60");
+                });
         });
     });
-
-    clearChatsButton.addEventListener("click", function () {
-        const confirmed = confirm("Are you sure you want to clear all AI Agent chats?");
-
-        if (!confirmed) {
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append("csrfmiddlewaretoken", getCsrfToken());
-
-        fetch("{% url 'ai_agent_widget_clear_all_chats' %}", {
-            method: "POST",
-            body: formData,
-        })
-        .then(function (response) {
-            return response.json();
-        })
-        .then(function (data) {
-            if (data.success) {
-                sessionInput.value = data.session_id;
-                loaded = true;
-                setDefaultWelcomeMessage();
-                input.focus();
-            } else {
-                addMessage("agent", data.error || "Unable to clear chats.");
-            }
-        })
-        .catch(function (error) {
-            console.error("Clear chats failed:", error);
-            addMessage("agent", "Clear chat request failed.");
-        });
-    });
-
-    form.addEventListener("submit", function (event) {
-        event.preventDefault();
-
-        const message = input.value.trim();
-
-        if (!message) {
-            return;
-        }
-
-        addMessage("user", message);
-
-        input.value = "";
-        sendButton.disabled = true;
-        sendButton.classList.add("opacity-60");
-
-        addThinking();
-
-        const formData = new FormData();
-        formData.append("session_id", sessionInput.value);
-        formData.append("message", message);
-        formData.append("csrfmiddlewaretoken", getCsrfToken());
-
-        fetch("{% url 'ai_agent_widget_send' %}", {
-            method: "POST",
-            body: formData,
-        })
-        .then(function (response) {
-            return response.json();
-        })
-        .then(function (data) {
-            removeThinking();
-
-            if (data.success) {
-                sessionInput.value = data.session_id;
-                addMessage("agent", data.reply, data.tool_name || "");
-            } else {
-                addMessage("agent", data.error || "Something went wrong.");
-            }
-        })
-        .catch(function (error) {
-            console.error("AI Agent send failed:", error);
-            removeThinking();
-            addMessage("agent", "AI agent request failed. Please try again.");
-        })
-        .finally(function () {
-            sendButton.disabled = false;
-            sendButton.classList.remove("opacity-60");
-        });
-    });
-});
 </script>
 
 {% endif %}
@@ -987,7 +1538,7 @@ document.addEventListener("DOMContentLoaded", function () {
 <script>
     let loaderInterval = null;
 
-    function showLoading(){
+    function showLoading() {
         var overlay = document.getElementById("loadingOverlay");
         var progressBar = document.getElementById("loaderProgressBar");
         var counterText = document.getElementById("loaderCounterText");
@@ -1111,59 +1662,27 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
+    document.addEventListener("DOMContentLoaded", function () {
+        const revealItems = document.querySelectorAll(".cf-reveal");
 
-    newChatButton.addEventListener("click", function () {
-    const formData = new FormData();
-    formData.append("csrfmiddlewaretoken", getCsrfToken());
-
-    fetch("{% url 'ai_agent_widget_new_session' %}", {
-        method: "POST",
-        body: formData,
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            sessionInput.value = data.session_id;
-            setDefaultWelcomeMessage();
-            input.focus();
-        } else {
-            addMessage("agent", "Unable to start a new chat.");
+        if (!revealItems.length) {
+            return;
         }
-    })
-    .catch(() => {
-        addMessage("agent", "New chat request failed.");
+
+        const observer = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("cf-visible");
+                }
+            });
+        }, {
+            threshold: 0.12
+        });
+
+        revealItems.forEach(function (item) {
+            observer.observe(item);
+        });
     });
-});
-
-
-clearChatsButton.addEventListener("click", function () {
-    const confirmed = confirm("Are you sure you want to clear all AI Agent chats?");
-
-    if (!confirmed) {
-        return;
-    }
-
-    const formData = new FormData();
-    formData.append("csrfmiddlewaretoken", getCsrfToken());
-
-    fetch("{% url 'ai_agent_widget_clear_all_chats' %}", {
-        method: "POST",
-        body: formData,
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            sessionInput.value = data.session_id;
-            setDefaultWelcomeMessage();
-            input.focus();
-        } else {
-            addMessage("agent", "Unable to clear chats.");
-        }
-    })
-    .catch(() => {
-        addMessage("agent", "Clear chat request failed.");
-    });
-});
 </script>
 
 {% block extra_js %}

@@ -1,262 +1,1089 @@
 {% extends 'base.html' %}
 
 {% block title %}
-CareerFlow
+CareerFlow | AI Recruitment Platform
 {% endblock %}
 
 {% block extra_css %}
 <style>
-    .soft-gradient-text {
-        background: linear-gradient(90deg, #60a5fa, #22d3ee);
+    :root {
+        --cf-blue: #2563eb;
+        --cf-blue-dark: #1d4ed8;
+        --cf-sky: #0ea5e9;
+        --cf-cyan: #06b6d4;
+        --cf-indigo: #4f46e5;
+        --cf-teal: #14b8a6;
+        --cf-slate: #0f172a;
+        --cf-muted: #64748b;
+        --cf-border: #e2e8f0;
+        --cf-soft: #f8fafc;
+        --cf-soft-blue: #eff6ff;
+        --cf-shadow-sm: 0 10px 30px rgba(15, 23, 42, 0.07);
+        --cf-shadow-md: 0 24px 70px rgba(15, 23, 42, 0.12);
+        --cf-shadow-blue: 0 24px 70px rgba(37, 99, 235, 0.22);
+    }
+
+    body {
+        background: #f8fafc !important;
+        color: var(--cf-slate) !important;
+    }
+
+    .gradient-bg {
+        background:
+            radial-gradient(circle at 15% 10%, rgba(37, 99, 235, 0.10), transparent 28%),
+            radial-gradient(circle at 85% 15%, rgba(6, 182, 212, 0.10), transparent 30%),
+            linear-gradient(180deg, #ffffff 0%, #f8fafc 45%, #eef6ff 100%) !important;
+    }
+
+    .blob {
+        opacity: 0.10 !important;
+    }
+
+    nav.glass {
+        background: #ffffff !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+        box-shadow: 0 8px 30px rgba(15, 23, 42, 0.06) !important;
+    }
+
+    nav a,
+    nav p,
+    nav h1,
+    nav span {
+        color: #0f172a !important;
+    }
+
+    nav a:hover {
+        color: var(--cf-blue) !important;
+    }
+
+    .cf-page {
+        background: #f8fafc;
+        color: var(--cf-slate);
+    }
+
+    .cf-gradient-text {
+        background: linear-gradient(90deg, #2563eb, #06b6d4, #14b8a6);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }
 
-    .soft-card {
-        transition: all .25s ease;
+    .cf-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 15px;
+        border-radius: 999px;
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        color: #1d4ed8;
+        font-size: 13px;
+        font-weight: 800;
     }
 
-    .soft-card:hover {
-        transform: translateY(-6px);
-        border-color: rgba(34, 211, 238, .45);
-        box-shadow: 0 22px 55px rgba(8, 145, 178, .14);
+    .cf-primary-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 16px 26px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, #2563eb, #06b6d4);
+        color: #ffffff !important;
+        font-weight: 800;
+        box-shadow: 0 18px 40px rgba(37, 99, 235, 0.25);
+        transition: all 0.28s ease;
     }
 
-    .fade-up {
-        animation: fadeUp .55s ease both;
+    .cf-primary-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 24px 55px rgba(37, 99, 235, 0.32);
     }
 
-    .fade-up-delay {
-        animation: fadeUp .75s ease both;
+    .cf-secondary-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 16px 26px;
+        border-radius: 16px;
+        background: #ffffff;
+        color: #1e40af !important;
+        border: 1px solid #bfdbfe;
+        font-weight: 800;
+        transition: all 0.28s ease;
     }
 
-    @keyframes fadeUp {
-        from {
-            opacity: 0;
-            transform: translateY(18px);
-        }
-        to {
-            opacity: 1;
+    .cf-secondary-btn:hover {
+        background: #eff6ff;
+        transform: translateY(-3px);
+        border-color: #60a5fa;
+    }
+
+    .cf-card {
+        background: #ffffff;
+        border: 1px solid var(--cf-border);
+        border-radius: 30px;
+        box-shadow: var(--cf-shadow-sm);
+        transition: all 0.3s ease;
+    }
+
+    .cf-card:hover {
+        transform: translateY(-7px);
+        box-shadow: var(--cf-shadow-md);
+        border-color: #bfdbfe;
+    }
+
+    .cf-section-title {
+        font-size: clamp(2.3rem, 5vw, 4.5rem);
+        line-height: 1.02;
+        letter-spacing: -0.06em;
+        font-weight: 900;
+        color: var(--cf-slate);
+    }
+
+    .cf-section-subtitle {
+        color: var(--cf-muted);
+        font-size: 1.08rem;
+        line-height: 1.85;
+    }
+
+    .cf-reveal {
+        opacity: 0;
+        transform: translateY(26px);
+        transition: all 0.75s cubic-bezier(.2, .7, .2, 1);
+    }
+
+    .cf-reveal.cf-visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .cf-float {
+        animation: cfFloat 5.5s ease-in-out infinite;
+    }
+
+    @keyframes cfFloat {
+        0%, 100% {
             transform: translateY(0);
         }
+
+        50% {
+            transform: translateY(-16px);
+        }
     }
 
-    .hero-panel {
-        background:
-            linear-gradient(145deg, rgba(255,255,255,.08), rgba(255,255,255,.03)),
-            radial-gradient(circle at top right, rgba(34,211,238,.16), transparent 40%);
-    }
-
-    .mini-step-line {
+    .cf-grid-bg {
         position: absolute;
-        left: 23px;
-        top: 52px;
-        bottom: -18px;
-        width: 1px;
-        background: rgba(148, 163, 184, .25);
-    }
-
-    .simple-orb {
-        position: absolute;
-        border-radius: 999px;
-        filter: blur(90px);
-        opacity: .22;
+        inset: 0;
+        background-image:
+            linear-gradient(rgba(37, 99, 235, 0.06) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(37, 99, 235, 0.06) 1px, transparent 1px);
+        background-size: 44px 44px;
+        mask-image: linear-gradient(to bottom, black, transparent 85%);
         pointer-events: none;
+    }
+
+    .cf-low-image {
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(90deg, rgba(248, 250, 252, 0.96), rgba(248, 250, 252, 0.78)),
+            url("https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1800&q=80");
+        background-size: cover;
+        background-position: center;
+        opacity: 1;
+        pointer-events: none;
+    }
+
+    .cf-orb {
+        position: absolute;
+        width: 360px;
+        height: 360px;
+        border-radius: 999px;
+        filter: blur(95px);
+        opacity: 0.22;
+        pointer-events: none;
+    }
+
+    .cf-mini-line {
+        position: absolute;
+        left: 26px;
+        top: 56px;
+        bottom: -25px;
+        width: 1px;
+        background: linear-gradient(#bfdbfe, transparent);
+    }
+
+    .cf-dashboard-shell {
+        background: radial-gradient(circle at top right, rgb(255 255 255 / 18%), transparent 35%), 
+                    linear-gradient(145deg, #ffffff, #f8fafc);
+    }
+
+    .cf-glow-border {
+        position: relative;
+    }
+
+    .bg-slate-950 {
+    --tw-bg-opacity: 1;
+    background-color: rgb(2 6 23 / var(--tw-bg-opacity, 1)) !important;
+}
+
+.bg-white\/10 {
+    background-color: rgb(255 255 255 / 0.1) ! important;
+}
+
+    .cf-glow-border::before {
+        content: "";
+        position: absolute;
+        inset: -1px;
+        border-radius: inherit;
+        background: linear-gradient(135deg, rgba(37, 99, 235, 0.45), rgba(6, 182, 212, 0.25), rgba(20, 184, 166, 0.25));
+        z-index: -1;
+        opacity: 0.8;
+    }
+
+    .cf-icon-box {
+        width: 56px;
+        height: 56px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 23px;
+    }
+
+    .cf-image-card {
+        background:
+            linear-gradient(135deg, rgba(15, 23, 42, 0.72), rgba(30, 64, 175, 0.72)),
+            url("https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1600&q=80");
+        background-size: cover;
+        background-position: center;
+    }
+
+    .text-red-600 {
+    --tw-text-opacity: 1;
+    color: rgb(220 38 38 / var(--tw-text-opacity, 1)) !important;
+}
+
+    .text-white {
+    --tw-text-opacity: 1;
+    color: rgb(255 255 255 / var(--tw-text-opacity, 1)) !important;
+}
+
+
+    #buttons {
+            color: white !important;
+        }
+
+    .cf-dark-panel {
+        background:
+            radial-gradient(circle at top right, rgba(56, 189, 248, 0.28), transparent 38%),
+            linear-gradient(135deg, #0f172a, #1e3a8a);
+    }
+
+    .cf-job-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 26px;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+        transition: all 0.3s ease;
+    }
+
+    .cf-job-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 24px 65px rgba(37, 99, 235, 0.15);
+        border-color: #bfdbfe;
+    }
+
+    .cf-marquee {
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .cf-marquee-inner {
+        display: inline-flex;
+        gap: 18px;
+        animation: cfMarquee 22s linear infinite;
+    }
+
+    @keyframes cfMarquee {
+        from {
+            transform: translateX(0);
+        }
+
+        to {
+            transform: translateX(-50%);
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
 
-<!-- HERO -->
-<section class="relative overflow-hidden">
+<div class="cf-page">
 
-    <div class="simple-orb w-96 h-96 bg-blue-500 left-[-120px] top-20"></div>
-    <div class="simple-orb w-96 h-96 bg-cyan-500 right-[-120px] top-44"></div>
+    <!-- HERO / PLAIN WHITE HEADER SECTION -->
+    <section class="relative overflow-hidden bg-white">
 
-    <div class="relative max-w-7xl mx-auto px-8 py-24 lg:py-28">
+        <div class="cf-grid-bg"></div>
 
-        <div class="grid lg:grid-cols-2 gap-16 items-center">
+        <div class="cf-orb bg-blue-300 left-[-150px] top-16"></div>
+        <div class="cf-orb bg-cyan-300 right-[-140px] top-48"></div>
 
-            <!-- Left Content -->
-            <div class="fade-up">
+        <div class="relative max-w-7xl mx-auto px-6 lg:px-8 py-24 lg:py-26">
 
-                <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-300 text-sm font-semibold">
-                    <i class="fa-solid fa-sparkles"></i>
-                    AI Recruitment Platform
-                </span>
+            <div class="grid lg:grid-cols-2 gap-16 items-center">
 
-                <h1 class="mt-8 text-5xl lg:text-6xl font-black leading-tight tracking-tight">
-                    Resume analysis and
-                    <span class="soft-gradient-text">
-                        job matching
+                <div class="cf-reveal">
+
+                    <span class="cf-badge">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        Future-ready AI recruitment platform
                     </span>
-                    made simple
-                </h1>
 
-                <p class="mt-7 text-lg lg:text-xl text-gray-400 leading-8 max-w-2xl">
-                    Job seekers can analyze resumes, improve ATS scores, and apply to matching jobs.
-                    Recruiters can post jobs, review applicants, and manage hiring from one dashboard.
-                </p>
+                    <h1 class="mt-8 cf-section-title">
+                        Hire smarter.
+                        Apply better.
+                        Grow faster with
+                        <span class="cf-gradient-text">CareerFlow AI.</span>
+                    </h1>
 
-                <div class="mt-10 flex flex-wrap gap-4">
+                    <p class="mt-7 cf-section-subtitle max-w-2xl">
+                        CareerFlow brings resume intelligence, ATS scoring, job matching,
+                        recruiter dashboards, AI agents, and application tracking into one clean hiring platform.
+                    </p>
 
-                    {% if request.user.is_authenticated %}
+                    <div class="mt-10 flex flex-wrap gap-4">
 
-                        {% if request.user.profile.role == "recruiter" %}
+                        {% if request.user.is_authenticated %}
 
-                            <a href="{% url 'recruiter_dashboard' %}"
-                               class="px-7 py-4 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 font-semibold hover:opacity-90 transition">
-                                Recruiter Dashboard
-                            </a>
+                            {% if request.user.is_staff %}
 
-                            <a href="{% url 'recruiter_job_create' %}"
-                               class="px-7 py-4 rounded-xl border border-slate-600 hover:border-cyan-400 transition font-semibold">
-                                Post a Job
-                            </a>
+                                <a href="{% url 'platform_admin_dashboard' %}" class="cf-primary-btn">
+                                    <i class="fa-solid fa-gauge-high"></i>
+                                    Admin Dashboard
+                                </a>
+
+                                <a href="{% url 'job_list' %}" class="cf-secondary-btn">
+                                    Browse Jobs
+                                </a>
+
+                            {% elif request.user.profile.role == "recruiter" %}
+
+                                <a href="{% url 'recruiter_dashboard' %}" class="cf-primary-btn">
+                                    <i class="fa-solid fa-briefcase"></i>
+                                    Recruiter Dashboard
+                                </a>
+
+                                <a href="{% url 'recruiter_job_create' %}" class="cf-secondary-btn">
+                                    Post a Job
+                                </a>
+
+                            {% else %}
+
+                                <a href="{% url 'upload_resume' %}" class="cf-primary-btn">
+                                    <i class="fa-solid fa-file-arrow-up"></i>
+                                    Analyze Resume
+                                </a>
+
+                                <a href="{% url 'job_list' %}" class="cf-secondary-btn">
+                                    Browse Jobs
+                                </a>
+
+                            {% endif %}
 
                         {% else %}
 
-                            <a href="{% url 'upload_resume' %}"
-                               class="px-7 py-4 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 font-semibold hover:opacity-90 transition">
-                                Analyze Resume
+                            <a href="{% url 'register' %}" class="cf-primary-btn">
+                                <i class="fa-solid fa-user-plus"></i>
+                                Start as Job Seeker
                             </a>
 
-                            <a href="{% url 'job_list' %}"
-                               class="px-7 py-4 rounded-xl border border-slate-600 hover:border-cyan-400 transition font-semibold">
-                                Browse Jobs
+                            <a href="{% url 'recruiter_register' %}" class="cf-secondary-btn">
+                                <i class="fa-solid fa-building"></i>
+                                Register as Recruiter
                             </a>
 
                         {% endif %}
 
-                    {% else %}
+                    </div>
+
+                    <div class="mt-14 grid sm:grid-cols-3 gap-4 max-w-2xl">
+
+                        <div class="rounded-3xl bg-blue-50 border border-blue-100 p-5">
+                            <h3 class="text-3xl font-black text-blue-600">ATS</h3>
+                            <p class="text-slate-500 text-sm mt-1">Resume scoring</p>
+                        </div>
+
+                        <div class="rounded-3xl bg-sky-50 border border-sky-100 p-5">
+                            <h3 class="text-3xl font-black text-sky-600">AI</h3>
+                            <p class="text-slate-500 text-sm mt-1">Job matching</p>
+                        </div>
+
+                        <div class="rounded-3xl bg-teal-50 border border-teal-100 p-5">
+                            <h3 class="text-3xl font-black text-teal-600">CRM</h3>
+                            <p class="text-slate-500 text-sm mt-1">Recruiter tools</p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- FUTURISTIC DASHBOARD VISUAL -->
+                <div class="relative cf-reveal">
+
+                    <div class="absolute -top-8 -right-8 w-64 h-64 bg-blue-200 rounded-full blur-3xl opacity-60"></div>
+                    <div class="absolute -bottom-8 -left-8 w-64 h-64 bg-cyan-200 rounded-full blur-3xl opacity-60"></div>
+
+                    <div class="relative cf-glow-border rounded-[2rem] cf-float">
+
+                        <div class="cf-dashboard-shell rounded-[2rem] border border-white p-6 md:p-8 shadow-2xl">
+
+                            <div class="flex items-center justify-between">
+
+                                <div>
+                                    <p class="text-slate-500 text-sm font-semibold">AI Resume Intelligence</p>
+                                    <h2 class="text-3xl font-black mt-1 text-slate-950">Candidate Match</h2>
+                                </div>
+
+                                <div class="w-14 h-14 rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 text-white flex items-center justify-center shadow-lg shadow-blue-500/25">
+                                    <i class="fa-solid fa-robot text-2xl"></i>
+                                </div>
+
+                            </div>
+
+                            <div class="mt-8 rounded-3xl bg-gradient-to-br from-blue-600 via-blue-700 to-cyan-500 p-6 text-white shadow-xl">
+
+                                <div class="flex items-end justify-between gap-6">
+
+                                    <div>
+                                        <p class="text-blue-100 text-sm">ATS Score</p>
+                                        <h3 class="text-6xl font-black text-white mt-2">86%</h3>
+                                    </div>
+
+                                    <div class="text-right">
+                                        <p class="text-blue-100 text-sm">Target Role</p>
+                                        <h4 class="font-black text-white text-xl mt-1">Backend Developer</h4>
+                                    </div>
+
+                                </div>
+
+                                <div class="mt-8 space-y-4">
+
+                                    <div>
+                                        <div class="flex justify-between text-sm text-blue-100 mb-2">
+                                            <span>Skills Match</span>
+                                            <span>78%</span>
+                                        </div>
+                                        <div class="h-3 rounded-full bg-white/20 overflow-hidden">
+                                            <div class="h-full w-[78%] rounded-full bg-white"></div>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div class="flex justify-between text-sm text-blue-100 mb-2">
+                                            <span>ATS Keywords</span>
+                                            <span>91%</span>
+                                        </div>
+                                        <div class="h-3 rounded-full bg-white/20 overflow-hidden">
+                                            <div class="h-full w-[91%] rounded-full bg-white"></div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <div class="grid sm:grid-cols-2 gap-4 mt-5">
+
+                                <div class="rounded-3xl bg-white border border-slate-200 p-5">
+                                    <i class="fa-solid fa-circle-check text-blue-600 text-xl"></i>
+                                    <h4 class="font-black mt-3">Strong Skills</h4>
+                                    <p class="text-slate-500 text-sm mt-1">Python, Django, REST API</p>
+                                </div>
+
+                                <div class="rounded-3xl bg-white border border-slate-200 p-5">
+                                    <i class="fa-solid fa-lightbulb text-teal-600 text-xl"></i>
+                                    <h4 class="font-black mt-3">Add Keywords</h4>
+                                    <p class="text-slate-500 text-sm mt-1">Docker, AWS, CI/CD</p>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- MOVING CAPABILITY STRIP -->
+    <section class="bg-slate-950 py-5 border-y border-slate-800">
+
+        <div class="cf-marquee">
+
+            <div class="cf-marquee-inner">
+
+                <span class="px-5 py-2 rounded-full bg-white/10 text-white text-sm font-bold">ATS Resume Checker</span>
+                <span class="px-5 py-2 rounded-full bg-white/10 text-white text-sm font-bold">AI Job Matching</span>
+                <span class="px-5 py-2 rounded-full bg-white/10 text-white text-sm font-bold">Recruiter Dashboard</span>
+                <span class="px-5 py-2 rounded-full bg-white/10 text-white text-sm font-bold">Candidate Ranking</span>
+                <span class="px-5 py-2 rounded-full bg-white/10 text-white text-sm font-bold">Application Tracking</span>
+                <span class="px-5 py-2 rounded-full bg-white/10 text-white text-sm font-bold">AI Agent</span>
+
+                <span class="px-5 py-2 rounded-full bg-white/10 text-white text-sm font-bold">ATS Resume Checker</span>
+                <span class="px-5 py-2 rounded-full bg-white/10 text-white text-sm font-bold">AI Job Matching</span>
+                <span class="px-5 py-2 rounded-full bg-white/10 text-white text-sm font-bold">Recruiter Dashboard</span>
+                <span class="px-5 py-2 rounded-full bg-white/10 text-white text-sm font-bold">Candidate Ranking</span>
+                <span class="px-5 py-2 rounded-full bg-white/10 text-white text-sm font-bold">Application Tracking</span>
+                <span class="px-5 py-2 rounded-full bg-white/10 text-white text-sm font-bold">AI Agent</span>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- AI INTELLIGENCE SECTION -->
+    <section class="relative overflow-hidden py-24">
+
+        <div class="cf-low-image"></div>
+
+        <div class="relative max-w-7xl mx-auto px-6 lg:px-8">
+
+            <div class="grid lg:grid-cols-2 gap-16 items-center">
+
+                <div class="cf-reveal">
+
+                    <span class="cf-badge">
+                        <i class="fa-solid fa-brain"></i>
+                        AI intelligence layer
+                    </span>
+
+                    <h2 class="mt-6 cf-section-title">
+                        Turn resumes into useful hiring data.
+                    </h2>
+
+                    <p class="mt-6 cf-section-subtitle">
+                        CareerFlow reads resume content, identifies skills, finds missing keywords,
+                        checks ATS quality, and connects candidates with jobs where they have stronger fit.
+                    </p>
+
+                    <div class="mt-9 space-y-5">
+
+                        <div class="flex gap-4">
+                            <div class="cf-icon-box bg-blue-100 text-blue-600">
+                                <i class="fa-solid fa-file-lines"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-black text-xl">Resume parsing and scoring</h3>
+                                <p class="text-slate-500 mt-1">Extract skills, summary, strengths, weak areas, and ATS score.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4">
+                            <div class="cf-icon-box bg-sky-100 text-sky-600">
+                                <i class="fa-solid fa-key"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-black text-xl">Keyword gap analysis</h3>
+                                <p class="text-slate-500 mt-1">Suggest missing role-specific keywords and improvements.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4">
+                            <div class="cf-icon-box bg-teal-100 text-teal-600">
+                                <i class="fa-solid fa-bullseye"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-black text-xl">Job match recommendation</h3>
+                                <p class="text-slate-500 mt-1">Match resume skills against active job requirements.</p>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="cf-card p-6 md:p-8 cf-reveal">
+
+                    <div class="rounded-[1.7rem] bg-slate-950 p-6 text-white">
+
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-slate-400 text-sm">AI Report Preview</p>
+                                <h3 class="text-2xl font-black text-white mt-1">Resume Insights</h3>
+                            </div>
+                            <div class="w-12 h-12 rounded-2xl bg-blue-500 text-white flex items-center justify-center">
+                                <i class="fa-solid fa-chart-simple"></i>
+                            </div>
+                        </div>
+
+                        <div class="mt-7 grid grid-cols-2 gap-4">
+
+                            <div class="rounded-2xl bg-white/10 p-4">
+                                <p class="text-slate-300 text-xs">Strength</p>
+                                <h4 class="font-black text-white mt-2">Backend APIs</h4>
+                            </div>
+
+                            <div class="rounded-2xl bg-white/10 p-4">
+                                <p class="text-slate-300 text-xs">Missing</p>
+                                <h4 class="font-black text-white mt-2">Cloud Deploy</h4>
+                            </div>
+
+                            <div class="rounded-2xl bg-white/10 p-4">
+                                <p class="text-slate-300 text-xs">Improve</p>
+                                <h4 class="font-black text-white mt-2">Bullet Points</h4>
+                            </div>
+
+                            <div class="rounded-2xl bg-white/10 p-4">
+                                <p class="text-slate-300 text-xs">Ready For</p>
+                                <h4 class="font-black text-white mt-2">Job Apply</h4>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="mt-5 rounded-3xl bg-blue-50 border border-blue-100 p-5">
+                        <div class="flex items-start gap-4">
+                            <i class="fa-solid fa-wand-magic-sparkles text-blue-600 mt-1"></i>
+                            <p class="text-slate-600 leading-7">
+                                Add measurable achievements, role keywords, tools used, and clear project impact
+                                to improve ATS visibility and recruiter understanding.
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- FEATURES / DIFFERENT STYLE -->
+    <section class="bg-white py-24">
+
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+
+            <div class="max-w-3xl cf-reveal">
+
+                <span class="cf-badge">
+                    <i class="fa-solid fa-layer-group"></i>
+                    Platform modules
+                </span>
+
+                <h2 class="mt-6 cf-section-title">
+                    Built for every part of the hiring journey.
+                </h2>
+
+                <p class="mt-6 cf-section-subtitle">
+                    Candidates, recruiters, and admins each get tools designed for their exact workflow.
+                </p>
+
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-7 mt-14">
+
+                <div class="cf-card p-8 cf-reveal">
+                    <div class="cf-icon-box bg-blue-100 text-blue-600">
+                        <i class="fa-solid fa-file-waveform"></i>
+                    </div>
+                    <h3 class="font-black text-2xl mt-6">ATS Resume Checker</h3>
+                    <p class="text-slate-500 mt-4 leading-7">
+                        Analyze resumes, calculate ATS score, identify weak sections, and suggest improvements.
+                    </p>
+                </div>
+
+                <div class="cf-card p-8 cf-reveal">
+                    <div class="cf-icon-box bg-sky-100 text-sky-600">
+                        <i class="fa-solid fa-briefcase"></i>
+                    </div>
+                    <h3 class="font-black text-2xl mt-6">Smart Job Matching</h3>
+                    <p class="text-slate-500 mt-4 leading-7">
+                        Suggest active jobs using resume skills, target role, and recruiter requirements.
+                    </p>
+                </div>
+
+                <div class="cf-card p-8 cf-reveal">
+                    <div class="cf-icon-box bg-teal-100 text-teal-600">
+                        <i class="fa-solid fa-users-gear"></i>
+                    </div>
+                    <h3 class="font-black text-2xl mt-6">Recruiter Dashboard</h3>
+                    <p class="text-slate-500 mt-4 leading-7">
+                        Recruiters can post jobs, manage applications, and track candidates.
+                    </p>
+                </div>
+
+                <div class="cf-card p-8 cf-reveal">
+                    <div class="cf-icon-box bg-indigo-100 text-indigo-600">
+                        <i class="fa-solid fa-comments"></i>
+                    </div>
+                    <h3 class="font-black text-2xl mt-6">AI Agent</h3>
+                    <p class="text-slate-500 mt-4 leading-7">
+                        Users can ask the agent about resumes, jobs, applications, and platform data.
+                    </p>
+                </div>
+
+                <div class="cf-card p-8 cf-reveal">
+                    <div class="cf-icon-box bg-amber-100 text-amber-600">
+                        <i class="fa-solid fa-envelope-open-text"></i>
+                    </div>
+                    <h3 class="font-black text-2xl mt-6">Cover Letter Support</h3>
+                    <p class="text-slate-500 mt-4 leading-7">
+                        Generate clean cover letter drafts based on the job and candidate profile.
+                    </p>
+                </div>
+
+                <div class="cf-card p-8 cf-reveal">
+                    <div class="cf-icon-box bg-rose-100 text-rose-600">
+                        <i class="fa-solid fa-calendar-check"></i>
+                    </div>
+                    <h3 class="font-black text-2xl mt-6">Interview Preparation</h3>
+                    <p class="text-slate-500 mt-4 leading-7">
+                        Prepare interview questions and improvement plans for the target job.
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- CANDIDATE VS RECRUITER -->
+    <section class="bg-slate-50 py-24">
+
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+
+            <div class="grid lg:grid-cols-2 gap-8">
+
+                <div class="cf-card overflow-hidden cf-reveal">
+
+                    <div class="p-8 md:p-10">
+
+                        <div class="cf-icon-box bg-blue-100 text-blue-600">
+                            <i class="fa-solid fa-user-graduate"></i>
+                        </div>
+
+                        <h3 class="text-4xl font-black mt-7">For Job Seekers</h3>
+
+                        <p class="text-slate-500 mt-4 leading-8">
+                            Improve resume quality, discover relevant jobs, save opportunities,
+                            apply faster, and get AI-powered career guidance.
+                        </p>
+
+                        <div class="mt-8 space-y-4">
+
+                            <div class="flex gap-3">
+                                <i class="fa-solid fa-check text-blue-600 mt-1"></i>
+                                <p class="text-slate-600">Upload and analyze PDF resumes</p>
+                            </div>
+
+                            <div class="flex gap-3">
+                                <i class="fa-solid fa-check text-blue-600 mt-1"></i>
+                                <p class="text-slate-600">View ATS score, skills, and missing keywords</p>
+                            </div>
+
+                            <div class="flex gap-3">
+                                <i class="fa-solid fa-check text-blue-600 mt-1"></i>
+                                <p class="text-slate-600">Apply to matching jobs using saved CV</p>
+                            </div>
+
+                        </div>
+
+                        <div class="mt-9">
+                            <a href="{% url 'register' %}" class="cf-primary-btn">
+                                Start as Job Seeker
+                            </a>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="cf-dark-panel rounded-[30px] p-8 md:p-10 text-white shadow-2xl cf-reveal">
+
+                    <div class="cf-icon-box bg-white/15 text-white">
+                        <i class="fa-solid fa-user-tie"></i>
+                    </div>
+
+                    <h3 class="text-4xl font-black mt-7 text-white">For Recruiters</h3>
+
+                    <p class="text-blue-100 mt-4 leading-8">
+                        Create jobs, receive applications, compare match scores,
+                        manage candidate status, and shortlist with more confidence.
+                    </p>
+
+                    <div class="mt-8 space-y-4">
+
+                        <div class="flex gap-3">
+                            <i class="fa-solid fa-check text-cyan-300 mt-1"></i>
+                            <p class="text-blue-50">Create and manage job posts</p>
+                        </div>
+
+                        <div class="flex gap-3">
+                            <i class="fa-solid fa-check text-cyan-300 mt-1"></i>
+                            <p class="text-blue-50">View applicant profiles and resumes</p>
+                        </div>
+
+                        <div class="flex gap-3">
+                            <i class="fa-solid fa-check text-cyan-300 mt-1"></i>
+                            <p class="text-blue-50">Use AI match score for screening</p>
+                        </div>
+
+                    </div>
+
+                    <div class="mt-9">
+                        <a href="{% url 'recruiter_register' %}"
+                           class="inline-flex items-center gap-3 px-7 py-4 rounded-2xl bg-white text-blue-700 font-black hover:-translate-y-1 hover:shadow-xl transition">
+                            Start as Recruiter
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- HOW IT WORKS -->
+    <section class="bg-white py-24">
+
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+
+            <div class="text-center max-w-3xl mx-auto cf-reveal">
+
+                <span class="cf-badge">
+                    <i class="fa-solid fa-route"></i>
+                    Workflow
+                </span>
+
+                <h2 class="mt-6 cf-section-title">
+                    From resume upload to hiring decision.
+                </h2>
+
+            </div>
+
+            <div class="grid md:grid-cols-4 gap-6 mt-16">
+
+                <div class="relative cf-card p-7 text-center cf-reveal">
+                    <div class="mx-auto w-16 h-16 rounded-3xl bg-blue-600 text-white flex items-center justify-center text-2xl font-black">1</div>
+                    <h3 class="font-black text-xl mt-6">Upload Resume</h3>
+                    <p class="text-slate-500 mt-3 leading-7">Candidate uploads a resume for AI checking.</p>
+                </div>
+
+                <div class="relative cf-card p-7 text-center cf-reveal">
+                    <div class="mx-auto w-16 h-16 rounded-3xl bg-sky-500 text-white flex items-center justify-center text-2xl font-black">2</div>
+                    <h3 class="font-black text-xl mt-6">AI Analysis</h3>
+                    <p class="text-slate-500 mt-3 leading-7">System finds score, skills, gaps, and suggestions.</p>
+                </div>
+
+                <div class="relative cf-card p-7 text-center cf-reveal">
+                    <div class="mx-auto w-16 h-16 rounded-3xl bg-teal-500 text-white flex items-center justify-center text-2xl font-black">3</div>
+                    <h3 class="font-black text-xl mt-6">Match Jobs</h3>
+                    <p class="text-slate-500 mt-3 leading-7">Relevant roles are recommended to the candidate.</p>
+                </div>
+
+                <div class="relative cf-card p-7 text-center cf-reveal">
+                    <div class="mx-auto w-16 h-16 rounded-3xl bg-indigo-500 text-white flex items-center justify-center text-2xl font-black">4</div>
+                    <h3 class="font-black text-xl mt-6">Apply / Shortlist</h3>
+                    <p class="text-slate-500 mt-3 leading-7">Recruiter reviews and manages candidate status.</p>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- IMAGE BACKGROUND SECTION -->
+    <section class="py-24 bg-slate-50">
+
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+
+            <div class="cf-image-card rounded-[2.2rem] p-8 md:p-14 overflow-hidden shadow-2xl cf-reveal">
+
+                <div class="max-w-3xl">
+
+                    <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/15 border border-white/20 text-white text-sm font-bold">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        Admin controlled recruiter approval
+                    </span>
+
+                    <h2 class="text-4xl md:text-6xl font-black text-white mt-7 leading-tight">
+                        Keep recruiter access professional and verified.
+                    </h2>
+
+                    <p class="text-blue-100 mt-6 text-lg leading-8">
+                        Recruiters submit their company details and documents. Admins can approve,
+                        reject, monitor jobs, and manage platform quality before recruiters access the full system.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- LATEST JOBS -->
+    <section class="bg-white py-24">
+
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+
+            <div class="flex flex-col md:flex-row justify-between md:items-end gap-6 mb-12">
+
+                <div class="cf-reveal">
+
+                    <span class="cf-badge">
+                        <i class="fa-solid fa-briefcase"></i>
+                        Latest opportunities
+                    </span>
+
+                    <h2 class="mt-6 cf-section-title">
+                        Recently posted jobs
+                    </h2>
+
+                    <p class="mt-4 cf-section-subtitle">
+                        Explore new roles posted by approved recruiters.
+                    </p>
+
+                </div>
+
+                <a href="{% url 'job_list' %}" class="cf-secondary-btn">
+                    View all jobs
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>
+
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-7">
+
+                {% for job in recent_jobs %}
+
+                    <a href="{% url 'job_detail' job.id %}" class="cf-job-card p-7 block group cf-reveal">
+
+                        <div class="flex items-center justify-between gap-4">
+
+                            <span class="px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-100 text-xs font-black">
+                                {{ job.get_job_type_display }}
+                            </span>
+
+                            <span class="text-xs text-slate-400">
+                                {{ job.created_at|date:"d M Y" }}
+                            </span>
+
+                        </div>
+
+                        <h3 class="font-black text-2xl mt-6 group-hover:text-blue-600 transition">
+                            {{ job.title }}
+                        </h3>
+
+                        <p class="text-slate-500 mt-3">
+                            {{ job.company_name }}
+                        </p>
+
+                        <div class="flex items-center gap-2 text-slate-500 mt-6">
+                            <i class="fa-solid fa-location-dot text-blue-500"></i>
+                            {{ job.location }}
+                        </div>
+
+                        <div class="mt-7 flex items-center justify-between">
+
+                            <span class="text-blue-600 font-black">
+                                View Details
+                            </span>
+
+                            <span class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition">
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </span>
+
+                        </div>
+
+                    </a>
+
+                {% empty %}
+
+                    <div class="cf-card p-10 md:col-span-3 text-center cf-reveal">
+
+                        <div class="mx-auto w-20 h-20 rounded-3xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                            <i class="fa-solid fa-briefcase text-3xl"></i>
+                        </div>
+
+                        <h3 class="text-2xl font-black mt-6">
+                            No jobs posted yet
+                        </h3>
+
+                        <p class="text-slate-500 mt-3">
+                            Once recruiters create job posts, they will appear here.
+                        </p>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- FINAL CTA -->
+    <section class="bg-slate-50 py-24">
+
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+
+            <div class="relative overflow-hidden rounded-[2.3rem] bg-gradient-to-r from-blue-600 via-blue-700 to-cyan-500 p-8 md:p-16 shadow-2xl cf-reveal">
+
+                <div class="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_20%_20%,white_0,transparent_25%),radial-gradient(circle_at_80%_80%,white_0,transparent_25%)]"></div>
+
+                <div class="relative grid lg:grid-cols-2 gap-10 items-center">
+
+                    <div>
+
+                        <h2 class="text-4xl md:text-6xl font-black text-white leading-tight">
+                            Build your smarter hiring journey today.
+                        </h2>
+
+                        <p class="mt-5 text-blue-100 text-lg leading-8">
+                            Candidates improve faster. Recruiters screen smarter.
+                            Admins manage the platform with more control.
+                        </p>
+
+                    </div>
+
+                    <div class="flex flex-wrap lg:justify-end gap-4">
 
                         <a href="{% url 'register' %}"
-                           class="px-7 py-4 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 font-semibold hover:opacity-90 transition">
-                            Job Seeker Signup
+                           class="inline-flex items-center gap-3 px-7 py-4 rounded-2xl bg-white text-blue-700 font-black hover:-translate-y-1 hover:shadow-xl transition">
+                            Join as Candidate
                         </a>
 
                         <a href="{% url 'recruiter_register' %}"
-                           class="px-7 py-4 rounded-xl border border-slate-600 hover:border-cyan-400 transition font-semibold">
-                            Recruiter Signup
+                           class="inline-flex items-center gap-3 px-7 py-4 rounded-2xl bg-blue-950/20 border border-white/30 text-white font-black hover:bg-white/20 transition">
+                            Join as Recruiter
                         </a>
 
-                    {% endif %}
-
-                </div>
-
-                <div class="grid grid-cols-3 gap-5 mt-14 max-w-xl">
-
-                    <div class="glass rounded-2xl p-5">
-                        <h3 class="text-3xl font-black text-blue-400">ATS</h3>
-                        <p class="text-gray-400 text-sm mt-1">Resume score</p>
-                    </div>
-
-                    <div class="glass rounded-2xl p-5">
-                        <h3 class="text-3xl font-black text-cyan-400">AI</h3>
-                        <p class="text-gray-400 text-sm mt-1">Job matching</p>
-                    </div>
-
-                    <div class="glass rounded-2xl p-5">
-                        <h3 class="text-3xl font-black text-green-400">CRM</h3>
-                        <p class="text-gray-400 text-sm mt-1">Recruiter tools</p>
-                    </div>
-
-                </div>
-
-            </div>
-
-            <!-- Right Panel -->
-            <div class="fade-up-delay">
-
-                <div class="glass hero-panel rounded-[2rem] p-8 lg:p-10 shadow-2xl">
-
-                    <div class="flex items-center justify-between mb-8">
-
-                        <div>
-                            <p class="text-gray-400 text-sm font-semibold">Platform Preview</p>
-                            <h2 class="text-3xl font-black mt-2">Smart hiring flow</h2>
-                        </div>
-
-                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center">
-                            <i class="fa-solid fa-robot text-2xl"></i>
-                        </div>
-
-                    </div>
-
-                    <div class="space-y-6">
-
-                        <div class="relative flex gap-5">
-
-                            <div class="relative">
-                                <div class="w-12 h-12 rounded-2xl bg-blue-500/15 border border-blue-500/30 flex items-center justify-center text-blue-300">
-                                    <i class="fa-solid fa-file-arrow-up"></i>
-                                </div>
-                                <div class="mini-step-line"></div>
-                            </div>
-
-                            <div>
-                                <h3 class="font-bold text-lg">Upload resume</h3>
-                                <p class="text-gray-400 mt-1 leading-6">
-                                    Candidate uploads a PDF resume for AI analysis.
-                                </p>
-                            </div>
-
-                        </div>
-
-                        <div class="relative flex gap-5">
-
-                            <div class="relative">
-                                <div class="w-12 h-12 rounded-2xl bg-cyan-500/15 border border-cyan-500/30 flex items-center justify-center text-cyan-300">
-                                    <i class="fa-solid fa-brain"></i>
-                                </div>
-                                <div class="mini-step-line"></div>
-                            </div>
-
-                            <div>
-                                <h3 class="font-bold text-lg">AI analysis</h3>
-                                <p class="text-gray-400 mt-1 leading-6">
-                                    System extracts skills, ATS score, strengths, and missing skills.
-                                </p>
-                            </div>
-
-                        </div>
-
-                        <div class="relative flex gap-5">
-
-                            <div class="relative">
-                                <div class="w-12 h-12 rounded-2xl bg-green-500/15 border border-green-500/30 flex items-center justify-center text-green-300">
-                                    <i class="fa-solid fa-bullseye"></i>
-                                </div>
-                            </div>
-
-                            <div>
-                                <h3 class="font-bold text-lg">Match and apply</h3>
-                                <p class="text-gray-400 mt-1 leading-6">
-                                    Matching jobs are suggested and candidates can apply directly.
-                                </p>
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    <div class="mt-10 rounded-2xl bg-white/5 p-5 border border-white/10">
-
-                        <div class="flex items-center justify-between">
-
-                            <div>
-                                <p class="text-gray-400 text-sm">Sample AI match</p>
-                                <h3 class="text-2xl font-black mt-1">Backend Developer</h3>
-                            </div>
-
-                            <div class="text-right">
-                                <p class="text-green-400 text-3xl font-black">86%</p>
-                                <p class="text-gray-400 text-sm">match</p>
-                            </div>
-
-                        </div>
-
                     </div>
 
                 </div>
@@ -265,261 +1092,30 @@ CareerFlow
 
         </div>
 
-    </div>
-
-</section>
-
-<!-- FEATURES -->
-<section class="max-w-7xl mx-auto px-8 py-16">
-
-    <div class="text-center mb-12">
-
-        <h2 class="text-4xl lg:text-5xl font-black">
-            One platform for candidates and recruiters
-        </h2>
-
-        <p class="text-gray-400 mt-4 max-w-2xl mx-auto leading-7">
-            Simple tools for resume improvement, job discovery, job posting, and application tracking.
-        </p>
-
-    </div>
-
-    <div class="grid md:grid-cols-3 gap-7">
-
-        <div class="glass soft-card rounded-3xl p-8">
-
-            <div class="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-300 text-2xl">
-                <i class="fa-solid fa-file-waveform"></i>
-            </div>
-
-            <h3 class="text-2xl font-bold mt-6">Resume Checker</h3>
-
-            <p class="text-gray-400 mt-4 leading-7">
-                Analyze resumes, calculate ATS score, and receive improvement suggestions.
-            </p>
-
-        </div>
-
-        <div class="glass soft-card rounded-3xl p-8">
-
-            <div class="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-300 text-2xl">
-                <i class="fa-solid fa-briefcase"></i>
-            </div>
-
-            <h3 class="text-2xl font-bold mt-6">Job Matching</h3>
-
-            <p class="text-gray-400 mt-4 leading-7">
-                Suggest jobs by matching resume skills with recruiter job requirements.
-            </p>
-
-        </div>
-
-        <div class="glass soft-card rounded-3xl p-8">
-
-            <div class="w-14 h-14 rounded-2xl bg-green-500/10 border border-green-500/30 flex items-center justify-center text-green-300 text-2xl">
-                <i class="fa-solid fa-users-gear"></i>
-            </div>
-
-            <h3 class="text-2xl font-bold mt-6">Recruiter Dashboard</h3>
-
-            <p class="text-gray-400 mt-4 leading-7">
-                Recruiters can post jobs, receive applications, and manage candidate status.
-            </p>
-
-        </div>
-
-    </div>
-
-</section>
-
-<!-- USER TYPES -->
-<section class="max-w-7xl mx-auto px-8 py-16">
-
-    <div class="grid lg:grid-cols-2 gap-8">
-
-        <div class="glass soft-card rounded-[2rem] p-9">
-
-            <div class="flex items-center gap-4">
-
-                <div class="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-300 text-2xl">
-                    <i class="fa-solid fa-user"></i>
-                </div>
-
-                <div>
-                    <h3 class="text-2xl font-black">For Job Seekers</h3>
-                    <p class="text-gray-400 mt-1">Improve resume and apply faster.</p>
-                </div>
-
-            </div>
-
-            <div class="space-y-4 mt-8">
-
-                <div class="flex gap-3">
-                    <i class="fa-solid fa-check text-green-400 mt-1"></i>
-                    <p class="text-gray-300">Upload and analyze PDF resumes</p>
-                </div>
-
-                <div class="flex gap-3">
-                    <i class="fa-solid fa-check text-green-400 mt-1"></i>
-                    <p class="text-gray-300">View ATS score, skills, and missing skills</p>
-                </div>
-
-                <div class="flex gap-3">
-                    <i class="fa-solid fa-check text-green-400 mt-1"></i>
-                    <p class="text-gray-300">Apply to matching jobs using saved CV</p>
-                </div>
-
-            </div>
-
-            <a href="{% url 'register' %}"
-               class="inline-block mt-8 px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 font-semibold">
-                Start as Job Seeker
-            </a>
-
-        </div>
-
-        <div class="glass soft-card rounded-[2rem] p-9">
-
-            <div class="flex items-center gap-4">
-
-                <div class="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-300 text-2xl">
-                    <i class="fa-solid fa-user-tie"></i>
-                </div>
-
-                <div>
-                    <h3 class="text-2xl font-black">For Recruiters</h3>
-                    <p class="text-gray-400 mt-1">Post jobs and manage hiring.</p>
-                </div>
-
-            </div>
-
-            <div class="space-y-4 mt-8">
-
-                <div class="flex gap-3">
-                    <i class="fa-solid fa-check text-green-400 mt-1"></i>
-                    <p class="text-gray-300">Create and manage job posts</p>
-                </div>
-
-                <div class="flex gap-3">
-                    <i class="fa-solid fa-check text-green-400 mt-1"></i>
-                    <p class="text-gray-300">View job applications and candidate details</p>
-                </div>
-
-                <div class="flex gap-3">
-                    <i class="fa-solid fa-check text-green-400 mt-1"></i>
-                    <p class="text-gray-300">Review AI match score for each applicant</p>
-                </div>
-
-            </div>
-
-            <a href="{% url 'recruiter_register' %}"
-               class="inline-block mt-8 px-6 py-3 rounded-xl border border-slate-600 hover:border-cyan-400 font-semibold">
-                Start as Recruiter
-            </a>
-
-        </div>
-
-    </div>
-
-</section>
-
-<!-- LATEST JOBS -->
-<section class="max-w-7xl mx-auto px-8 py-16">
-
-    <div class="flex flex-col md:flex-row justify-between md:items-end gap-6 mb-10">
-
-        <div>
-            <h2 class="text-4xl font-black">Latest Jobs</h2>
-            <p class="text-gray-400 mt-3">Recent jobs posted by recruiters.</p>
-        </div>
-
-        <a href="{% url 'job_list' %}" class="text-cyan-400 font-semibold">
-            View all jobs
-            <i class="fa-solid fa-arrow-right ml-2"></i>
-        </a>
-
-    </div>
-
-    <div class="grid md:grid-cols-3 gap-7">
-
-        {% for job in recent_jobs %}
-
-            <a href="{% url 'job_detail' job.id %}" class="glass soft-card rounded-3xl p-7 block">
-
-                <div class="flex items-center justify-between gap-4">
-
-                    <span class="text-sm text-cyan-400 font-semibold">
-                        {{ job.get_job_type_display }}
-                    </span>
-
-                    <span class="text-xs text-gray-500">
-                        {{ job.created_at|date:"d M Y" }}
-                    </span>
-
-                </div>
-
-                <h3 class="font-bold text-2xl mt-5">
-                    {{ job.title }}
-                </h3>
-
-                <p class="text-gray-400 mt-3">
-                    {{ job.company_name }}
-                </p>
-
-                <div class="flex items-center gap-2 text-gray-400 mt-5">
-                    <i class="fa-solid fa-location-dot"></i>
-                    {{ job.location }}
-                </div>
-
-                <div class="mt-6 text-cyan-400 font-semibold">
-                    View Details
-                </div>
-
-            </a>
-
-        {% empty %}
-
-            <div class="glass rounded-3xl p-10 md:col-span-3 text-center">
-                <i class="fa-solid fa-briefcase text-5xl text-gray-600"></i>
-                <h3 class="text-2xl font-bold mt-6">No jobs posted yet</h3>
-                <p class="text-gray-400 mt-2">Recruiters can create the first job post.</p>
-            </div>
-
-        {% endfor %}
-
-    </div>
-
-</section>
-
-<!-- CTA -->
-<section class="max-w-7xl mx-auto px-8 py-16">
-
-    <div class="glass rounded-[2rem] p-10 lg:p-12 text-center">
-
-        <h2 class="text-4xl lg:text-5xl font-black">
-            Start building your hiring pipeline today
-        </h2>
-
-        <p class="text-gray-400 mt-5 max-w-2xl mx-auto leading-7">
-            Use AI resume analysis, job matching, and recruiter dashboards to make hiring faster and clearer.
-        </p>
-
-        <div class="mt-8 flex justify-center flex-wrap gap-4">
-
-            <a href="{% url 'register' %}"
-               class="px-7 py-4 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 font-semibold">
-                Job Seeker Signup
-            </a>
-
-            <a href="{% url 'recruiter_register' %}"
-               class="px-7 py-4 rounded-xl border border-slate-600 hover:border-cyan-400 font-semibold">
-                Recruiter Signup
-            </a>
-
-        </div>
-
-    </div>
-
-</section>
-
+    </section>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const revealItems = document.querySelectorAll(".cf-reveal");
+
+        const observer = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("cf-visible");
+                }
+            });
+        }, {
+            threshold: 0.12
+        });
+
+        revealItems.forEach(function (item) {
+            observer.observe(item);
+        });
+    });
+</script>
 {% endblock %}
